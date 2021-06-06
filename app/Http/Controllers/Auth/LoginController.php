@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
@@ -26,7 +27,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    protected $redirectTo = '/schedule';
 
     /**
      * Create a new controller instance.
@@ -36,5 +37,18 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+    
+    /**
+     * ユーザーを探す条件を指定する
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return Response
+     */
+    protected function credentials(Request $request)
+    {
+        // status確認が本登録済み「1」を確認
+        $request->merge(['status' => 1]);
+        return $request->only($this->username(), 'password', 'status');
     }
 }

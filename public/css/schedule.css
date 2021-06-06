@@ -1,0 +1,585 @@
+/* ---------------- 共通 ---------------- */
+
+.calendar,
+.plan,
+.plan-list,
+.confirm-list,
+.plan-confirm {
+    font-family: 'Hiragino Kaku Gothic ProN','ヒラギノ角ゴ ProN W3','YuGothic','Yu Gothic','メイリオ', 'Meiryo','ＭＳ ゴシック',sans-serif;
+}
+
+.container .row h2.title {
+  margin-bottom: 0px !important;
+}
+
+/* ---------------- /schedule ---------------- */
+
+@media (max-width: 991px) {
+    .calendar {
+        margin: 0 auto;
+    }
+
+    .plan-list {
+        margin: 0 auto;
+    }
+}
+
+.calendar .flash-message {
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: red;
+}
+
+.calendar .description {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 14px;
+    color: rgb(119, 119, 119);
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+/* ----------------カレンダー---------------- */
+
+.calendar .card-header h2 {
+    display: inline;
+    font-size: 20px;
+}
+
+.calendar .day-blank {
+    background-color: #efefef;
+}
+
+.calendar table td a {
+    text-decoration: none;
+}
+
+.calendar table td a .day {
+    text-align: center;
+    color: black;
+}
+
+.calendar table td.day-sun a .day{
+    color:red;
+}
+
+.calendar table td.day-sat a .day{
+    color: blue;
+}
+
+.calendar table td {	
+    border: solid 1px #999;
+    padding: 0;
+}
+
+.calendar table td:before {
+    display: block;
+    float: left;
+    height: 20px;
+}
+
+.calendar table td .day {
+    margin-bottom: 0;
+    padding: 3px;
+}
+
+.calendar table .holiday .day {
+    color: red;
+}
+
+.calendar table th {
+    border: solid 1px #999;
+    text-align: center;
+    height: 20px;
+}
+
+.calendar .table th {
+    padding: 0px;
+}
+
+.card-header:first-child {
+    font-size: 18px;
+    line-height: 30px;
+}
+
+.calendar .day:hover {
+    background-color: peachpuff;
+}
+
+/* ----------------予定一覧 ----------------*/
+
+.plan-list ul {
+    border-bottom: 1px solid #999;
+    width: 80%;
+    margin: 0 auto 20px;
+    padding-left: 15px;
+    font-size: 0;
+}
+
+@media(max-width:991px){
+    .plan-list ul {
+    width: 100%;
+    }
+}
+
+.plan-list li.color {
+    display: inline-block;
+    margin: 0 auto;
+    width: 14%;
+    height: auto;
+    border: 1px solid #aaa;
+    border-radius: 8px 8px 0 0;
+    font-size: 12px;
+    text-align: center;
+    color: rgb(54, 54, 54);
+}
+
+.plan-list ul li.selected {
+    border: 3px solid rgb(81, 81, 81);
+    border-bottom: 1px solid #aaa;
+    font-weight: bold;
+}
+
+.plan-list #pink {
+    background-color: pink;
+}
+
+.plan-list #orange {
+    background-color: orange;
+}
+
+.plan-list #palegreen {
+    background-color: palegreen;
+}
+
+.plan-list #skyblue {
+    background-color: skyblue;
+}
+
+.plan-list #tomato {
+    background-color: tomato;
+}
+
+.plan-list #gray {
+    background-color: gray;
+}
+
+.plan-list {
+    font-family: sans-serif;
+}
+
+.plan-list h2 {
+    font-size: 40px;
+    text-align: center;
+    color: rgb(236, 236, 236);
+    width: 300px;
+    height: 60px;
+    line-height: 60px;
+    margin: 20px auto 45px auto;
+    border-radius: 10px;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.8);
+}
+
+.plan-list h3,
+.plan-list .datetime .start-time {
+    font-size: 18px;
+    color: blue;
+    font-weight: 600;
+}
+
+.plan-list .plan {
+    margin: 0 0 0 auto;
+    border-radius: 0 4px 4px 0;
+    width: 90%;
+    height: auto;
+    background-color: #fff;
+}
+
+.plan-list a {
+    text-decoration: none;
+}
+
+.plan-list .plans-oneday {
+    margin-bottom: 20px;
+}
+
+.plan-list .plan-wrap {
+    width: 100%;
+    margin-bottom: 15px;
+    border: solid 1px;
+    border-color: #ddd;
+    border-radius: 4px;
+    padding: 1px;
+    height: auto;
+}
+
+.plan-list .datetime {
+    padding-left: 5px;
+    font-size: 13px;
+    color: #222;
+}
+
+.plan-list .datetime:before {
+  content: "  ";
+}
+
+.plan-list .content {
+  font-size: 15px;
+  text-align: left;
+  font-weight: 900;
+  white-space: pre-line;
+  color: #444;
+  margin: 10px 10px 0 10px;
+  height: auto;
+}
+
+.plan-list .plan-other {
+  display: none;
+  padding: 10px 0;
+}
+
+.plan-list i {
+  display: inline-block;
+  font-size: 30px;
+  text-align: right;
+  margin: 5px 20px 0;
+  color: rgb(209, 209, 209);
+}
+
+.plan-list .inline-block {
+  display: inline-block;
+}
+
+.plan-list .open {
+  transform: rotate(180deg);
+}
+
+.plan-list .plan-wrap .detail {
+  margin: 0 5px 15px 5px;
+  padding: 5px;
+  color: rgb(91, 91, 91);
+  background-color: rgb(239, 239, 239);
+  border-radius: 5px;
+  height: auto;
+}
+
+.plan-list .btn-wrap {
+  margin: 0 10px;
+  text-align: right;
+}
+
+.plan-list .btn-wrap .btn {
+  margin-left: 10px;
+}
+
+@media (max-width:991px){
+  .plan-list h2 {
+    margin-top: 50px;
+  }
+}
+
+/*---------------- 詳細確認画面 ----------------*/
+
+.confirm-list dt {
+  border-bottom: 1px solid;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.confirm-list dd {
+  font-size: 15px;
+  background-color: rgb(154, 154, 154);
+  color: white;
+  border-radius: 2px;
+  width: 60px;
+  text-align: center;
+}
+
+.confirm-list dt.datetime {
+  font-size: 20px;
+}
+
+.confirm-list dt.content {
+  font-size: 25px;
+  text-align: center;
+}
+
+.confirm-list dt.detail {
+  font-size: 15px;
+  white-space: pre-wrap;
+}
+
+.confirm-list .text {
+  display: inline-block;
+  width: 75%;
+}
+
+.confirm-wrap .btn-wrap .btn {
+  display: inline-block;
+  width: 80px;
+}
+
+/*---------------- 予定入力画面 ----------------*/
+
+.card-header .title {
+  font-size: 20px;
+  color: #888;
+}
+
+.plan-datetime label.datetime {
+  width: 16%;
+  color: #fff;
+  text-align: center;
+  height: 30px;
+  line-height: 30px;
+  font-size: 15px;
+  margin-bottom: 0px;
+  background-color: #aaa;
+}
+
+.plan-datetime .date {
+  width: 50%;
+  height: 2.5em;
+  border: 1px solid #aaa;
+  border-right: none;
+  text-align: center;
+}
+
+
+.flex-center-wrapper {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.plan-datetime .start-end {
+  background-color: #aaa;
+  border-radius: 4px;
+}
+
+.plan-datetime .time {
+  width: 34%;
+  height: 2.5em;
+  border: 1px solid #aaa;
+  border-radius: 0 4px 4px 0;
+  text-align: center;
+}
+
+@media (max-width: 991px) {
+  .plan-datetime .start-end {
+    margin-bottom: 20px;
+  }
+
+  .plan .tag .color {
+    height: auto;
+    font-size: 12px;
+  }
+
+  .plan .tag .color span {
+    width:22%;
+  }
+}
+
+@media (min-width: 992px) {
+  .plan-datetime {
+    margin-bottom: 20px;
+  }
+
+  .br-min-992 {
+    display: none !important;
+  }
+
+  .plan .tag .color {
+    height: 40px;
+
+  }
+
+  .plan .tag input:first-of-type {
+    margin-left: 0;
+  }
+}
+
+
+.plan .tag .color {
+  width: 100%;
+  border: 1px solid #aaa;
+  border-radius: 0 4px 4px 4px;
+  line-height: 40px;
+  text-align: center;
+}
+
+.plan .tag .color span {
+  display: inline-block;
+  height: 1.5em;
+  line-height: 1.5em;
+  margin-left: 2px;
+}
+
+.plan .tag {
+  margin-bottom: 20px;
+}
+
+.plan .tag input {
+  margin-left: 10px;
+}
+
+.plan .tag span {
+  color: #fff;
+  border-radius: 4px;
+  padding: 0 5px;
+}
+
+.plan .tag span.color1 {
+  background-color: pink;
+}
+
+.plan .tag span.color2 {
+  background-color: orange;
+}
+
+.plan .tag span.color3 {
+  background-color: palegreen;
+}
+
+.plan .tag span.color4 {
+  background-color: skyblue;
+}
+
+.plan .tag span.color5 {
+  background-color: tomato;
+}
+
+.plan .tag span.color6 {
+  background-color: gray;
+}
+
+.plan .content label ,
+.plan .detail label,
+.plan .tag label {
+  border: 1px solid #aaa;
+  border-bottom: 0px;
+  margin-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  width: 120px;
+  background-color: #aaa;
+  color: #fff;
+  text-align: center;
+  font-size: 15px;
+}
+
+.plan .content input {
+  margin-bottom: 15px;
+  width: 100%;
+  height: 2.5rem;
+  border: 1px solid #aaa;
+  border-radius: 0 4px 4px 4px;
+  padding: 0 10px;
+}
+
+.plan .detail span {
+  font-size: 10px;
+}
+
+.plan .detail textarea {
+  height: 6rem;
+  width: 100%;
+  border: 1px solid #aaa;
+  border-radius: 0 4px 4px 4px;
+  margin-bottom: 10px;
+  padding: 5px 10px;
+}
+
+.plan button {
+  width: 100px;
+}
+
+/*---------------- 入力確認画面 ----------------*/
+
+.plan-confirm .confirm-list {
+  padding: 0;
+}
+
+.plan-confirm .confirm-list li {
+  list-style: none;
+}
+
+.plan-confirm .confirm-list .datetime {
+  text-align: center;
+  font-size: 24px;
+  margin: 0 0 15px 0;
+  color: rgb(255, 90, 90);
+}
+
+.plan-confirm .content-wrap {
+  border: 1px solid rgb(170, 170, 170);
+  padding: 0;
+  margin-bottom: 20px;
+  border-radius: 5px;
+}
+
+.plan-confirm .content-wrap .tag {
+  display: inline-block;
+  width: 15%;
+  text-align: center;
+  border-radius: 5px 0 0 5px;
+  color: #333030;
+}
+
+.plan-confirm .content-wrap .content {
+  font-weight: bold;
+  display: table;
+  float: right;
+  width: 84%;
+  overflow-y: scroll;
+  white-space: pre-wrap;
+}
+
+.plan-confirm .detail-wrap .detail {
+  font-weight: bold;
+  float: right;
+  width: 84%;
+  overflow-y: scroll;
+  height: 98px;
+  white-space: pre-wrap;
+  color: rgb(255, 90, 90);
+}
+
+.plan-confirm .content-wrap .content .table,
+.plan-confirm .detail-wrap .detail .table {
+  display: table-cell;
+  vertical-align: middle;
+  color: rgb(255, 90, 90);
+}
+
+.plan-confirm .detail-wrap {
+  border: 1px solid rgb(170, 170, 170);
+  border-radius: 5px;
+  padding: 0;
+  height: 100px;
+}
+
+.plan-confirm .detail-wrap .tag {
+  display: inline-block;
+  width: 15%;
+  height: 98px;
+  text-align: center;
+  border-radius: 5px 0 0 5px;
+  line-height: 98px;
+  color: #333030;
+}
+
+.plan-confirm button {
+  width: 100px;
+}
+
+@media (max-width: 768px) {
+  .plan-confirm .confirm-list .datetime {
+    font-size: 1.1em;
+    font-weight: bold;
+  }
+
+  .plan-confirm .content-wrap .content,
+  .plan-confirm .detail-wrap .detail {
+    font-size: 11px;
+  }
+}

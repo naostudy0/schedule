@@ -1,0 +1,75 @@
+/* 会員情報 */
+
+.customer .top-link {
+  margin: 0 0 5 20px;
+}
+
+.customer .title {
+  font-size: 20px;
+  color: #888;
+}
+
+.customer .flash-message {
+  margin-top: 10px;
+  color: red;
+}
+
+.customer .card-body .label {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.customer dl dd {
+  font-size: 18px;
+  margin-left: 20px;
+}
+
+.customer dl dd .attention {
+  font-size: 13px;
+}
+
+.customer .btn {
+  width: 100px;
+}
+
+.customer .delete {
+  border: 1px solid #bbb !important;
+}
+
+.customer .delete:hover {
+  background-color: #ddd;
+}
+
+.customer .clear {
+  clear: both;
+}
+
+.customer .change,
+.customer .delete {
+  margin-right: 20px;
+}
+
+.customer .btn_footer .btn {
+  margin: 20px 0 0 0;
+}
+/* 登録内容変更 */
+
+.customer .card-body input {
+  width: 100%;
+  height: 40px;
+  margin-bottom: 15px;
+}
+
+/* パスワード変更 */
+
+.customer form .new {
+  border-top: 1px dotted #888;
+  margin-top: 10px;
+  padding-top: 15px;
+}
+
+/* 退会 */
+.customer .confirm {
+  color: red;
+  font-size: 16px;
+}

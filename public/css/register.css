@@ -1,0 +1,17 @@
+/* ------------- 共通 ------------- */
+
+.register .card-header {
+  text-align: center;
+}
+
+.register a.btn,
+.register button.btn {
+  width: 90px;
+}
+
+/* ------------- header 会員情報 ------------- */
+
+.dropdown-menu p.user-name {
+  font-size: 15px;
+  margin-left: 20px;
+}
