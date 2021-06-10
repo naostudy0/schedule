@@ -2,6 +2,7 @@
 
 namespace App\Plan\OperationDatabase;
 
+use Illuminate\Support\Facades\Crypt;
 use App\Models\Plan;
 use Auth;
 
@@ -27,9 +28,9 @@ class PlanStore
             $this->inputs->end_date = $request->end_date;
             $this->inputs->end_time = $request->end_time;
             $this->inputs->color = $request->color;
-            $this->inputs->content = $request->content;
-            $this->inputs->detail = $request->detail;
-    
+            $this->inputs->content = Crypt::encrypt($request->content);
+            $this->inputs->detail = Crypt::encrypt($request->detail);
+
             $this->inputs->save();
             $this->result = '予定を登録しました。';
 

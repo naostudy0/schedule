@@ -2,6 +2,7 @@
 
 namespace App\Plan;
 
+use Illuminate\Support\Facades\Crypt;
 use App\Plan\PlanGet;
 
 class PlanView extends PlanGet
@@ -50,6 +51,13 @@ class PlanView extends PlanGet
 
             // 予定
             foreach ($plans as $plan) {
+
+                if( $plan['detail'] ){
+                    $detail = Crypt::decrypt($plan['detail']);
+                } else {
+                    $detail = '';
+                }
+
                 if ( $plan['start_date'] ===  $plan_day['start_date'] ) {
 
                     $this->html_plan[] = '<div class="plan-wrap ' . $plan['color'] . '" style="background-color: ' . $plan['color'] . ';">';
@@ -64,12 +72,12 @@ class PlanView extends PlanGet
                     $this->html_plan[] =                '<span class="inline-block"><time datetime="' . $plan['end_date'] . 'T' . $plan['end_time'] . '">';
                     $this->html_plan[] =                    str_replace('-', '/', $plan['end_date']) . '&nbsp;' . substr($plan['end_time'], 0, 5) . '</time></span>';
                     $this->html_plan[] =            '</p>'; // datetime
-                    $this->html_plan[] =            '<p class="content">' . $plan['content'] . '</p>';
+                    $this->html_plan[] =            '<p class="content">' . Crypt::decrypt($plan['content']) . '</p>';
                     $this->html_plan[] =        '</div>'; // plan-main
 
                     $this->html_plan[] =        '<div class="plan-other">';
                     $this->html_plan[] =            '<div class="detail">';
-                    $this->html_plan[] =                '<p>' . $plan['detail'] . '</p>';
+                    $this->html_plan[] =                '<p>' . $detail . '</p>';
                     $this->html_plan[] =            '</div>'; // detail
 
                     $this->html_plan[] =            '<div class="btn-wrap">';

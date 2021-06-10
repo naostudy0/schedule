@@ -2,6 +2,7 @@
 
 namespace App\Plan\OperationDatabase;
 
+use Illuminate\Support\Facades\Crypt;
 use App\Models\Plan;
 use Auth;
 
@@ -28,8 +29,8 @@ class PlanDelete
             $this->plan_exist = new PlanExist($request);
             $this->record = $this->plan_exist->getRecord();
             $this->date_redirect = '/schedule?date=' . substr($this->record['start_date'], 0, 7);
-            
-            $this->delete_id = decrypt($this->record['id']);
+
+            $this->delete_id = Crypt::decrypt($this->record['id']);
             $this->plan->where('id', $this->delete_id)->delete();
             $this->result = '予定を削除しました。';
 

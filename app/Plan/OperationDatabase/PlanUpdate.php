@@ -2,6 +2,7 @@
 
 namespace App\Plan\OperationDatabase;
 
+use Illuminate\Support\Facades\Crypt;
 use App\Models\Plan;
 use Auth;
 
@@ -22,7 +23,7 @@ class PlanUpdate
     {
         $this->update_data = $request->all();
 
-        $this->id = decrypt($this->update_data['id']);
+        $this->id = Crypt::decrypt($this->update_data['id']);
         try {
             $this->plan = new Plan;
 
@@ -32,8 +33,8 @@ class PlanUpdate
                 'end_date' => $this->update_data['end_date'],
                 'end_time' => $this->update_data['end_time'],
                 'color' => $this->update_data['color'],
-                'content' => $this->update_data['content'],
-                'detail' => $this->update_data['detail'],
+                'content' => Crypt::encrypt($this->update_data['content']),
+                'detail' => Crypt::encrypt($this->update_data['detail']),
             ]);
             
             $this->result = '予定を更新しました。';

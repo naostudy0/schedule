@@ -2,6 +2,7 @@
 
 namespace App\Plan\OperationDatabase;
 
+use Illuminate\Support\Facades\Crypt;
 use App\Models\Plan;
 use Auth;
 
@@ -22,7 +23,7 @@ class PlanExist
     {
         $this->request_all = $request->all();
         // 複合化
-        $this->plan_id = decrypt($this->request_all['id']);
+        $this->plan_id = Crypt::decrypt($this->request_all['id']);
 
         $this->user_id = Auth::id();
         $this->exist = Plan::where('id', $this->plan_id)->where('user_id', $this->user_id)->exists();
@@ -43,14 +44,19 @@ class PlanExist
     protected array $record_array;
 
     /**
-     * idを再度暗号化してレコードを配列で返す
+     * idを再度暗号化、content、detailを復号化してレコードを配列で返す
      * 
      * @return array
      */
     public function getRecord()
     {
         $this->record_array = $this->record->toArray();
-        $this->record_array['id'] = encrypt($this->record_array['id']);
+
+        $this->record_array['id'] = Crypt::encrypt($this->record_array['id']);
+        $this->record_array['content'] = Crypt::decrypt($this->record_array['content']);
+        if($this->record_array['detail']){
+            $this->record_array['detail'] = Crypt::decrypt($this->record_array['detail']);
+        }
 
         return $this->record_array;
     }
