@@ -29,6 +29,7 @@ class CalendarView
     }
 
     private array $html;
+    protected int $count = 0;
 
     /**
      * カレンダーを出力する
@@ -42,22 +43,25 @@ class CalendarView
             <table class="table">
             <thead>
                 <tr>
+                <th>日</th>
                 <th>月</th>
                 <th>火</th>
                 <th>水</th>
                 <th>木</th>
                 <th>金</th>
                 <th>土</th>
-                <th>日</th>
                 </tr>
             </thead>
             <tbody>
-        EOT;    
+        EOT;
 
         $weeks = $this->getWeeks();
+
         foreach($weeks as $week){
             $this->html[] = '<tr class="'.$week->getClassName().'">';
-            $days = $week->getDays();
+            
+            $this->count++;
+            $days = $week->getDays($this->count);
             foreach($days as $day){
                 $this->html[] = '<td class="'.$day->getClassName().'">';
                 $this->html[] = $day->render();
@@ -94,22 +98,32 @@ class CalendarView
         $this->first_day = $this->carbon->copy()->firstOfMonth();
         $this->last_day = $this->carbon->copy()->lastOfMonth();
 
-        //1週目
-        $this->week = new CalendarWeek($this->first_day->copy(), $this->index);
-        $this->weeks[] = $this->week;
-
-        //作業用 日曜日を取得
+        // 作業用 月曜日を取得
         $this->tmp_day = $this->first_day->copy()->addDay(7)->startOfWeek();
 
-        //月末までループさせる
+        // 1週目 (1日が日曜日の場合、後にweeks[0]をgetDays()すると、7日間全て前月の日付となるため除外する)
+        if (!$this->first_day->dayOfWeek == 0){
+            $this->week = new CalendarWeek($this->first_day->copy(), $this->index);
+            $this->weeks[] = $this->week;
+        } else {
+            $this->index = 0;
+        }
+
+        // 月末までループさせる
         while($this->tmp_day->lte($this->last_day)){
             //週カレンダーViewを作成する
             $this->index++;
             $this->week = new CalendarWeek($this->tmp_day, $this->index);
             $this->weeks[] = $this->week;
-
-            //次の週の日曜日
+            
+            //次の週の月曜日
             $this->tmp_day->addDay(7);
+        }
+
+        if ($this->last_day->dayOfWeek == 0) {
+            $this->index++;
+            $this->week = new CalendarWeek($this->tmp_day, $this->index);
+            $this->weeks[] = $this->week;
         }
 
         return $this->weeks;
