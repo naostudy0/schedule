@@ -1,0 +1,203 @@
+html, body {
+    font-family: 'Hiragino Kaku Gothic ProN','ヒラギノ角ゴ ProN W3','YuGothic','Yu Gothic','メイリオ', 'Meiryo','ＭＳ ゴシック',sans-serif;
+    background-color: #fff;
+    color: #636b6f;
+    font-weight: 200;
+    margin: 0;
+}
+
+body {
+    background-color: #F8FAFC;
+}
+
+header {
+    background-color: #fff;
+    position: relative;
+}
+
+header h1 {
+    position: absolute;
+    top: 20px;
+    left: 30px;
+    margin: 0;
+}
+
+.content{
+    width: 1000px;
+    margin: 0 auto;
+}
+
+
+.links {
+    height: 55px;
+    line-height: 55px;
+    text-align: right;
+    background-color: #fff;
+}
+
+.links a {
+    display: inline-block;
+    color: #636b6f;
+    text-decoration: none;
+    font-size: 14px;
+    padding: 0 20px;
+}
+
+.links a:last-child{
+    margin-right: 30px;
+}
+
+.sec1 img {
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+    height: 600px;
+    object-fit: cover;
+}
+
+h2 {
+    font-size: 30px;
+    margin: 20px 0;
+    padding-left: 5px;
+    border-left: 10px solid #636b6f;
+}
+
+.sec {
+    margin: 20px 0;
+    padding: 10px 20px;
+}
+
+.sec2 {
+    height: 350px;
+    background-color: rgb(240, 254, 219);
+    border-radius: 4px;
+}
+
+.sec2 .explanation {
+    float: left;
+    width: 50%;
+}
+
+.sec3 {
+    height: 200px;
+}
+
+.sec2 p,
+.sec3 p {
+    font-size: 18px;
+}
+
+.sec3 p {
+    text-decoration: underline;
+}
+
+.sec3 ul {
+    margin: 20px;
+}
+
+.sec ul li {
+    margin: 15px 0 0 0;
+}
+
+img.post-it {
+    width: 50%;
+    margin: 30px 0;
+    height: auto;
+}
+
+img.screen {
+    display: block;
+    width: 50%;
+}
+
+footer {
+    background-color: #dcdcdc;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    font-size: 14px;
+}
+
+@media (max-width: 1000px) {
+    .sec1 {
+        width: 100%;
+        height: auto;
+    }
+
+    .main {
+        width: 100%;
+    }
+
+    .content {
+        width: 100%;
+    }
+}
+
+@media (max-width: 800px) {
+    .sec1 img {
+        width: 100%;
+        min-height: 400px;
+        height: auto;
+    }
+
+    .sec2 {
+        height: 100%;
+    }
+
+    .sec2 .explanation {
+        width: 100%;
+        margin:  0 0 20px;
+    }
+    .explanation p {
+        display: inline-block;
+        padding: 10px;
+        width: 70%;
+    }
+
+    .sec3 {
+        height: 100%;
+    }
+
+    img.post-it {
+        float: right;
+        margin: 0;
+        width: 25%;
+    }
+
+    img.screen {
+        width: 80%;
+        display: block;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 600px) {
+    .links a {
+        padding: 0 10px;
+    }
+
+    .links a:last-child {
+        margin: 0 10px 0 0;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    .sec {
+        padding: 10px 10px;
+    }
+
+    .sec2 p,
+    .sec3 p {
+        font-size: 16px;
+    }
+
+    .explanation p {
+        padding: 5px;
+    }
+
+    ul li {
+        font-size: 14px;
+    }
+}
