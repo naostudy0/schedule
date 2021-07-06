@@ -8,12 +8,12 @@ use Auth;
 
 class PlanDelete
 {
-    private string $result;
-    private string $date_redirect;
-    private object $plan;
-    private array $record;
-    private object $plan_exist;
-    private int $delete_id;
+    private $result;
+    private $date_redirect;
+    private $plan;
+    private $record;
+    private $plan_exist;
+    private $delete_id;
 
     /**
      * 該当のidの予定を削除し、結果を文字列に設定する

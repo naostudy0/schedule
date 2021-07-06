@@ -6,11 +6,11 @@ use App\Plan\PlanColor;
 
 class PlanReCreate
 {
-    private array $plan;
-    private object $plan_color;
-    private array $recreate_data;
-    private array $color_checked;
-    private int $color_number;
+    private $plan;
+    private $plan_color;
+    private $recreate_data;
+    private $color_checked;
+    private $color_number;
 
     /**
      * 一度入力されたデータが初期値として表示されるよう設定する
@@ -24,6 +24,7 @@ class PlanReCreate
 
         $this->plan_color = new PlanColor;
         $this->color_checked = $this->plan_color->getRedisplayData($this->recreate_data['color']);
+
     }
 
     /**

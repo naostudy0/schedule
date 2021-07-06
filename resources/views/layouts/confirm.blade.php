@@ -33,21 +33,30 @@
                                             <span class="tag">詳細</span>
                                             <span class="detail"><span class="table">{{ $plan_data['detail'] }}</span></span>
                                         </li>
+
+                                        <div class="share-users">
+                                        @if( array_key_exists('share_users', $plan_data))
+                                            @if($plan_data['share_users'] == 0)
+                                                <p>■共有しない</p>
+                                            @elseif ($plan_data['share_users'] == 1)
+                                                <p>■共有するユーザー</p>
+                                                <ul>
+                                                @foreach ($share_user_name as $name)
+                                                    <li>{{ $name }}</li>
+                                                @endforeach
+                                                </ul>
+                                            @endif
+                                        @endif
+                                        </div>
                                     </ul>
 
                                     <form method="POST">
-                                        @csrf
-                                        <input type="hidden" name="start_date" id="start_date" value="{{ $plan_data['start_date'] }}">                   
-                                        <input type="hidden" name="start_time" id="start_time" value="{{ $plan_data['start_time'] }}">
-                                        <input type="hidden" name="end_date" id="end_date" value="{{ $plan_data['end_date'] }}">
-                                        <input type="hidden" name="end_time" id="end_time" value="{{ $plan_data['end_time'] }}">
-                                        <input type="hidden" name="color" id="color" value="{{ $plan_data['color'] }}">
-                                        <input type="hidden" name="content" id="content" value="{{ $plan_data['content'] }}">
-                                        <input type="hidden" name="detail" id="detail" value="{{ $plan_data['detail'] }}">
+
+                                        @yield('hidden')
                                         @yield('id')
 
                                         <div class="btn-wrap">
-                                        @yield('btn')
+                                            @yield('btn')
                                         </div><!-- btn-wrap -->
                                     </form>
                                 </div><!-- col -->

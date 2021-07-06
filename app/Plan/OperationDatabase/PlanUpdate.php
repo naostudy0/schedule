@@ -8,11 +8,11 @@ use Auth;
 
 class PlanUpdate
 {
-    private string $result;
-    private array $update_data;
-    private object $plan;
-    private string $id;
-    private string $date_redirect;
+    private $result;
+    private $update_data;
+    private $plan;
+    private $id;
+    private $date_redirect;
 
     /**
      * 該当のidの予定を更新し、結果を文字列に設定する
@@ -22,6 +22,9 @@ class PlanUpdate
     public function __construct($request)
     {
         $this->update_data = $request->all();
+
+        $share_store = new ShareStore($this->update_data);
+        $this->update_data['share_user_id'] = $share_store->getData();
 
         $this->id = Crypt::decrypt($this->update_data['id']);
         try {
@@ -35,6 +38,7 @@ class PlanUpdate
                 'color' => $this->update_data['color'],
                 'content' => Crypt::encrypt($this->update_data['content']),
                 'detail' => Crypt::encrypt($this->update_data['detail']),
+                'share_user_id' => $this->update_data['share_user_id'],
             ]);
             
             $this->result = '予定を更新しました。';

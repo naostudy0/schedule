@@ -6,8 +6,8 @@ use Carbon\Carbon;
 
 class CalendarWeek
 {
-    protected object $carbon;
-    protected int $index;
+    protected $carbon;
+    protected $index;
 
     /**
      * Carbonインスタンス作成と、$indexを受け取る
@@ -26,11 +26,11 @@ class CalendarWeek
         return "week-" . $this->index;
     }
 
-    protected array $days = [];
-    protected object $start_day;
-    protected object $last_day;
-    protected object $tmp_day;
-    protected object $day;
+    protected $days = [];
+    protected $start_day;
+    protected $last_day;
+    protected $tmp_day;
+    protected $day;
 
     /**
      * 1ヶ月分のカレンダーに表示される日付を返す（前月・翌月は空白）
@@ -55,7 +55,7 @@ class CalendarWeek
                     // 当月は日付を設定
                     $this->day = new CalendarWeekDay($this->tmp_day->copy());
                     $this->days[] = $this->day;
-                    
+
                 } else {
                     // 前月または翌月の場合は空白を設定
                     $this->day = new CalendarWeekBlankDay($this->tmp_day->copy());

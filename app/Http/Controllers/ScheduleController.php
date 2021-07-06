@@ -33,13 +33,18 @@ class ScheduleController extends Controller
         }
 
         $calendar = new CalendarView($date);
-        
         $year_month = date('Y-m',$date);
+        
         $plan_view = new PlanView($year_month);
+        $plans = $plan_view->getPlans();
+        $plan_days = $plan_view->getPlanDays();
+        $plan_colors = $plan_view->getPlanColors();
 
         return view('schedule.schedule', [
             "calendar" => $calendar,
-            'plan_view' => $plan_view,
+            "plans" => $plans,
+            "plan_days" => $plan_days,
+            'plan_colors' => $plan_colors,
         ]);
     }
 }

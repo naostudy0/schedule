@@ -6,7 +6,7 @@ use Carbon\Carbon;
 
 class CalendarView
 {
-    private object $carbon;
+    private $carbon;
 
     /**
      * Carbonをインスタンス化
@@ -28,8 +28,8 @@ class CalendarView
         return $this->carbon->format('Y年n月');
     }
 
-    private array $html;
-    protected int $count = 0;
+    private $html;
+    protected $count = 0;
 
     /**
      * カレンダーを出力する
@@ -59,7 +59,7 @@ class CalendarView
 
         foreach($weeks as $week){
             $this->html[] = '<tr class="'.$week->getClassName().'">';
-            
+
             $this->count++;
             $days = $week->getDays($this->count);
             foreach($days as $day){
@@ -79,12 +79,12 @@ class CalendarView
         return implode("", $this->html);
     }
 
-    protected array $weeks;
-    protected object $first_day;
-    protected object $last_day;
-    protected object $tmp_day;
-    protected object $week;
-    protected int $index = 1;
+    protected $weeks;
+    protected $first_day;
+    protected $last_day;
+    protected $tmp_day;
+    protected $week;
+    protected $index = 1;
 
     /**
      * 何週目かを返す

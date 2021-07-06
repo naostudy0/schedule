@@ -54,7 +54,6 @@
                                         <p class="text-danger">{{ $errors->first('end_time') }}</p>
                                         @endif
                                     </div><!-- col -->
-
                                 </div><!-- row -->
                             </div><!-- plan-datetime -->
 
@@ -93,6 +92,28 @@
                                 @endif
                             </div><!-- detail -->
 
+                            @if ($plan_data['share_users'])
+                            <div class="share offset-lg-1 col-lg-10">
+                                <h2>予定共有</h2>
+                                <div class="share_users">
+                                    <div class="radio-wrapper">
+                                        <input type="radio" id="disallow" name="share_users" value="0" checked>
+                                        <label for="disallow">共有しない</label>
+                                    </div>
+                                    <div class="radio-wrapper">
+                                        <input type="radio" id="allow" name="share_users" value="1">
+                                        <label for="allow">共有する</label>
+                                    </div>
+
+                                    <div id="share-checkbox" class="hide">
+                                        @foreach ($plan_data['share_users'] as $share_user)
+                                        <label><input type="checkbox" name="share_user[]" value="{{$share_user['share_id']}}">{{$share_user['name']}}</label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div><!-- detail -->
+                            @endif
+
                             @yield('id')
 
                             <div class="btn-wrap offset-lg-1 col-lg-10">
@@ -106,4 +127,19 @@
         </div><!-- plan -->
     </div><!-- row -->
 </div><!-- container -->
+@endsection
+
+
+@section('script')
+<script>
+$(function(){
+    $('#allow').on('click', function(){
+        $('#share-checkbox').slideToggle(this.checked);
+    });
+
+    $('#disallow').on('click', function(){
+        $('#share-checkbox').slideToggle(this.checked);
+    });
+});
+</script>
 @endsection

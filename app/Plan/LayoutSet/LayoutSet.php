@@ -4,14 +4,14 @@ namespace App\Plan\LayoutSet;
 
 class LayoutSet
 {
-    private array $tag_colors;
-    private string $height_content;
-    private string $new_line;
-    private string $tag_color;
-    private int $len_content;
-    private int $len_detail;
-    private int $search;
-    private array $layout;
+    private $tag_colors;
+    private $height_content;
+    private $new_line;
+    private $tag_color;
+    private $len_content;
+    private $len_detail;
+    private $search;
+    private $layout;
 
     /**
      * 「内容」「詳細」「タグ」の表示方法を設定する

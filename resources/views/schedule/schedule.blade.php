@@ -25,13 +25,112 @@
             </div><!-- card -->
 
             <p class="description">日付をクリックして予定を登録できます</p>
+            <p class="description add">予定共有管理から予定共有ユーザーを追加すると、予定入力時に共有選択画面が追加されます。</p>
         </div><!-- calendar -->
 
         <div class="plan-list col-lg-8 col-md-10 col-lg-7">
             <h2>予定一覧</h2>
-            <ul>{!! $plan_view->getTagColor() !!}</ul>
+            <ul>
+                @if (count($plan_colors) >= 2)
+                    <li class="color selected" id="all">ALL</li>
 
-            {!! $plan_view->getPlanView() !!}
+                    @foreach ($plan_colors as $key => $value)
+                        <li class="color" id="{{ $value }}">&nbsp;</li>
+                    @endforeach
+                @else
+                    @foreach ($plan_colors as $key => $value)
+                        <li class="color selected" id="{{ $value }}">&nbsp;</li>
+                    @endforeach
+                @endif
+            </ul>
+
+            @foreach( $plan_days as $plan_day )
+                <div class="plans-oneday">
+                    <h3>{{ str_replace('-', '/', $plan_day['start_date']) }}</h3>
+                    @foreach( $plans as $plan )
+                        @if( $plan['start_date'] ===  $plan_day['start_date'] )
+                            @if( $plan['user_id'] == Auth::id() )
+                                <div class="plan-wrap {{ $plan['color'] }}" style="background-color: {{ $plan['color'] }};">
+                                    <section class="plan">
+                                        <div class="plan-main">
+                                            <i class="fas fa-angle-double-down float-right"></i>
+                                            <p class="datetime">
+                                                {{ str_replace('-', '/', $plan['start_date']) }} <span class="start-time">{{ substr($plan['start_time'], 0, 5) }}</span> 〜 <span class="inline-block">{{ str_replace('-', '/', $plan['end_date']) }} {{ substr($plan['end_time'], 0, 5) }}</span>
+                                        
+                                                @if($plan['share_user_id'])
+                                                <i class="fas fa-user-friends float-right share-icon"></i>
+                                                @endif
+                                            </p>
+                                            
+                                            <p class="content">{{$plan['content']}}</p>
+                                        </div><!-- plan-main -->
+
+                                        <div class="plan-other">
+                                            <div class="detail">
+                                                <p>{{$plan['detail']}}</p>
+                                            </div><!-- detail -->
+
+                                            @if($plan['share_user_id'])
+                                            <div class="share-users">
+                                                <p>
+                                                    この予定は、<br>
+                                                
+                                                    @foreach($plan['share_users'] as $user_data)
+                                                        <span class="user-name">&nbsp;&nbsp;{{ $user_data['name'] }}</span>さん<br>
+                                                    @endforeach
+                                                    
+                                                    と共有しています
+                                                </p>
+                                            </div><!-- share-users -->
+                                            @endif
+
+                                            <div class="btn-wrap">
+                                                <a class="btn btn-primary" href="/plan/update?id={{ $plan['id'] }}">修正</a>
+                                                <a class="btn btn-danger" href="/plan/delete_confirm?id={{ $plan['id'] }}">削除</a>
+                                            </div><!-- btn-wrap -->
+                                        </div><!-- plan-other -->
+                                    </section><!-- plan -->
+                                </div><!-- plan_wrap -->
+                            @else
+                                <div class="plan-wrap {{ $plan['color'] }}" style="background-color: {{ $plan['color'] }};">
+                                    <section class="plan">
+                                        <div class="plan-main plan-share">
+                                            <i class="fas fa-angle-double-down float-right"></i>
+                                            <p class="datetime">
+                                                {{ str_replace('-', '/', $plan['start_date']) }} <span class="start-time">{{ substr($plan['start_time'], 0, 5) }}</span> 〜 <span class="inline-block">{{ str_replace('-', '/', $plan['end_date']) }} {{ substr($plan['end_time'], 0, 5) }}</span>
+                                                @if($plan['share_user_id'])
+                                                <i class="fas fa-user-friends float-right share-icon"></i>
+                                                @endif
+                                            </p>
+
+                                            <p class="content">{{$plan['content']}}</p>
+                                        </div><!-- plan-main -->
+
+                                        <div class="plan-other plan-share">
+                                            <div class="detail">
+                                                <p>{{$plan['detail']}}</p>
+                                            </div><!-- detail -->
+
+                                            <div class="share-users">
+                                                <p><span class="user-name">{{$plan['name']}}</span>さんにより追加されました</p><br>
+                                                <p>
+                                                    この予定は、<br>
+                                                
+                                                    @foreach($plan['share_users'] as $user_data)
+                                                        <span class="user-name">&nbsp;&nbsp;{{ $user_data['name'] }}</span>さん<br>
+                                                    @endforeach
+                                                    
+                                                    と共有されています
+                                                </p>
+                                            </div><!-- share-users -->
+                                        </div><!-- plan-other -->
+                                    </section><!-- plan -->
+                                </div><!-- plan_wrap -->
+                            @endif
+                        @endif
+                    @endforeach
+                </div><!-- plans-oneday -->
+            @endforeach
         </div><!-- plan-list -->
     </div><!-- row -->
 </div><!-- container -->

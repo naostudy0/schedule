@@ -7,9 +7,9 @@ use Yasumi\Yasumi;
 
 class CalendarWeekDay 
 {
-    protected object $carbon;
-    protected object $holidays;
-    protected bool $holiday_check;
+    protected $carbon;
+    protected $holidays;
+    protected $holiday_check;
 
     /**
      * Carbonインスタンス作成と祝日判定

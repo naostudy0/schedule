@@ -67,6 +67,7 @@ class RegisterController extends Controller
         if(!User::where('email', $request->email)->exists() || User::where('email', $request->email)->where('status', '1')->exists()){
             $this->validator($request->all())->validate();
         }
+
         $request->flashOnly('email');
 
         $bridge_request = $request->all();

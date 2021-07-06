@@ -2,13 +2,17 @@
 
 namespace App\Plan;
 
+use App\User;
+use Auth;
+use App\Plan\OperationDatabase\PlanShare;
+
 class PlanCreate
 {
-    private array $initialize;
-    private string $year;
-    private string $month;
-    private string $day;
-    private string $cancel_check;
+    private $initialize;
+    private $year;
+    private $month;
+    private $day;
+    private $cancel_check;
 
     /**
      * views.plan.create用の変数を初期化する
@@ -47,6 +51,9 @@ class PlanCreate
                 $this->initialize['cancel_date'] = $this->cancel_check;
             }
         }
+
+        $plan_share = new PlanShare;
+        $this->initialize['share_users'] = $plan_share->getData();
     }
 
     /**

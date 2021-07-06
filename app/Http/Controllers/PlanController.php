@@ -13,6 +13,9 @@ use App\Plan\OperationDatabase\PlanUpdate;
 use App\Plan\OperationDatabase\PlanStore;
 use App\Plan\OperationDatabase\PlanExist;
 use App\Plan\OperationDatabase\PlanDelete;
+use App\Plan\OperationDatabase\PlanShare;
+use App\Share\ShareIdChange;
+use App\Share\ShareIdNameGet;
 use App\User;
 use Auth;
 
@@ -46,11 +49,24 @@ class PlanController extends Controller
     {
         $plan_data = $request->all();
 
+        // 予定共有するにチェックされているが、共有するユーザーが指定されていない場合は共有しないに変更
+        $plan_data['share_user'] ?? $plan_data['share_users'] = 0;
+
+        if ($plan_data['share_users'] == 1){
+            foreach($plan_data['share_user'] as $share_id){
+                $share_id_change = new ShareIdChange($share_id);
+                $share_user_name[] = $share_id_change->getName();
+            }
+        } else {
+            $share_user_name = null;
+        }
+
         $layout_set = new LayoutSet($plan_data);
 
         return view('plan.create_confirm', [
             'plan_data' => $plan_data,
             'layout_set' => $layout_set,
+            'share_user_name' => $share_user_name,
             ]);
     }
 
@@ -63,6 +79,8 @@ class PlanController extends Controller
     {
         $plan_recreate = new PlanReCreate($request);
         $plan_data = $plan_recreate->getData();
+        $plan_share = new PlanShare;
+        $plan_data['share_users'] = $plan_share->getData();
         
         $color_checked = $plan_recreate->getColor();
 
@@ -89,7 +107,7 @@ class PlanController extends Controller
     }
 
 
-    private string $not_exist = '該当の予定が見つかりませんでした。';
+    private $not_exist = '該当の予定が見つかりませんでした。';
 
     /**
      * 「予定一覧」画面で修正をクリック時
@@ -109,6 +127,9 @@ class PlanController extends Controller
         } else {
 
             $plan_data = $plan_exist->getRecord();
+
+            $plan_share = new PlanShare;
+            $plan_data['share_users'] = $plan_share->getData();
 
             $plan_color = new PlanColor;
             $color_checked = $plan_color->getRedisplayData($plan_data['color']);
@@ -130,9 +151,20 @@ class PlanController extends Controller
         $plan_data = $request->toArray();
         $layout_set = new LayoutSet($plan_data);
 
+        $exist = array_key_exists('share_user', $plan_data);
+        if ($exist) {
+            foreach($plan_data['share_user'] as $share_id){
+                $share_id_change = new ShareIdChange($share_id);
+                $share_user_name[] = $share_id_change->getName();
+            }
+        } else {
+            $share_user_name = null;
+        }
+
         return view('plan.update_confirm', [
             'plan_data' => $plan_data,
             'layout_set' => $layout_set,
+            'share_user_name' => $share_user_name,
             ]);
     }
 
@@ -145,6 +177,8 @@ class PlanController extends Controller
     {
         $plan_recreate = new PlanReCreate($request);
         $plan_data = $plan_recreate->getData();
+        $plan_share = new PlanShare;
+        $plan_data['share_users'] = $plan_share->getData();
         $color_checked = $plan_recreate->getColor();
 
         return view('plan.update',[
@@ -188,9 +222,20 @@ class PlanController extends Controller
             $plan_data = $plan_exist->getRecord();
             $layout_set = new LayoutSet($plan_data);
 
+            if ($plan_data['share_user_id']){
+                $plan_data['share_users'] = 1;
+                $share_id_name_get = new ShareIdNameGet($plan_data['share_user_id']);
+                $share_user_name = $share_id_name_get->getName();
+
+            } else {
+                $plan_data['share_users'] = 0;
+                $share_user_name = null;
+            }
+
             return view('plan.delete_confirm', [
                 'plan_data' => $plan_data,
                 'layout_set' => $layout_set,
+                'share_user_name' => $share_user_name,
                 ]);
         }
     }

@@ -5,12 +5,13 @@ namespace App\Plan\OperationDatabase;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\Plan;
 use Auth;
+use App\Share\ShareIdChange;
 
 class PlanStore
 {
-    private string $result;
-    private object $inputs;
-    private string $date_redirect;
+    private $result;
+    private $inputs;
+    private $date_redirect;
 
     /**
      * 予定を登録し、結果を文字列に設定する
@@ -19,6 +20,12 @@ class PlanStore
      */
     public function __construct($request)
     {
+        $request_array = $request->all();
+
+        $share_store = new ShareStore($request_array);
+        $share_user_id = $share_store->getData();
+
+
         try{
             $this->inputs = new Plan;
             $this->inputs->user_id = Auth::id();
@@ -30,6 +37,7 @@ class PlanStore
             $this->inputs->color = $request->color;
             $this->inputs->content = Crypt::encrypt($request->content);
             $this->inputs->detail = Crypt::encrypt($request->detail);
+            $this->inputs->share_user_id = $share_user_id;
 
             $this->inputs->save();
             $this->result = '予定を登録しました。';

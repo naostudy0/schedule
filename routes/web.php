@@ -29,6 +29,7 @@ Route::get('register/verify/{token}', 'Auth\RegisterController@showForm');
 Route::post('register/main_check', 'Auth\RegisterController@mainCheck')->name('register.main.check');
 Route::post('register/main_register', 'Auth\RegisterController@mainRegister')->name('register.main.registered');
 
+// 予定管理画面
 Route::get('/schedule', 'ScheduleController@show')->name('schedule')->middleware('auth');
 
 // 予定作成
@@ -62,6 +63,15 @@ Route::post('/customer/registed_password_store', 'CustomerController@registedPas
 Route::get('/customer/registed_email_update', 'CustomerController@registedEmailUpdate')->name('customer.email.update')->middleware('auth');
 Route::post('/customer/registed_email_confirm', 'CustomerController@registedEmailConfirm')->name('customer.email.confirm')->middleware('auth');
 Route::get('/customer/registed_email/verify/{token}', 'CustomerController@emailUpdated')->name('customer.email.store');
+
+// 予定共有
+Route::get('/share', 'ShareController@show')->name('share.show')->middleware('auth');
+Route::post('/share', 'ShareController@changeShare')->name('share.change')->middleware('auth');
+Route::post('/share/request', 'ShareController@shareSearch')->name('share.request')->middleware('auth');
+Route::post('/share/request/permit', 'ShareController@sharePermit')->name('share.request.permit')->middleware('auth');
+Route::post('/share/send', 'ShareController@shareSend')->name('share.send')->middleware('auth');
+Route::post('/share/send/delete', 'ShareController@shareSendDelete')->name('share.send.delete')->middleware('auth');
+Route::post('/share/delete', 'ShareController@shareDelete')->name('share.delete')->middleware('auth');
 
 // 退会
 Route::get('/customer/delete_check', 'CustomerController@accountDeleteConfirm')->name('customer.delete.confirm')->middleware('auth');

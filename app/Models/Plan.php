@@ -19,6 +19,7 @@ class Plan extends Model
         'end_time',
         'content',
         'detail',
+        'share_user_id',
     ];
 
     public function user()

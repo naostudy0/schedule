@@ -4,8 +4,8 @@ namespace App\Plan;
 
 class PlanColor
 {
-    private array $color_checked;
-    private int $i;
+    private $color_checked;
+    private $i;
 
     /**
      * ラジオボタンのチェック判定用の変数を初期化

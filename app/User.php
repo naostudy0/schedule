@@ -22,6 +22,9 @@ class User extends Authenticatable
         'password',
         'email_verified',
         'email_verify_token',
+        'share_id',
+        'share_permission',
+        'share_user_id',
     ];
 
     /**
@@ -47,5 +50,6 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\Plan');
         return $this->hasMany('App\Models\EmailUpdate');
+        return $this->hasMany('App\Models\ShareRequest');
     }
 }

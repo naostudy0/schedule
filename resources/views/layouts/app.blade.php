@@ -21,6 +21,7 @@
     <link href="{{ asset('css/register.css') }}" rel="stylesheet">
     <link href="{{ asset('css/schedule.css') }}" rel="stylesheet">
     <link href="{{ asset('css/customer.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/share.css') }}" rel="stylesheet">
     @yield('style')
 </head>
 <body>
@@ -53,8 +54,13 @@
                                 </li>
                             @endif
                         @else
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                            <li class="nav-list">
+                                <a href="{{ route('share.show') }}" class="nav-menu"
+                                href="{{ route('share.show') }}";>
+                                予定共有管理</a>
+                            </li>
+                            <li class="nav-item dropdown nav-list">
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle nav-menu" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     会員情報 <span class="caret"></span>
                                 </a>
 
@@ -65,7 +71,7 @@
 
                                     <a class="dropdown-item" href="{{ route('customer.show') }}"
                                        onclick="location.href='{{ route('customer.show') }}'";>
-                                        登録内容確認・変更
+                                        会員情報確認
                                     </a>
 
                                     <a class="dropdown-item" href="{{ route('logout') }}"

@@ -1,3 +1,5 @@
+@charset "UTF-8";
+
 html, body {
     font-family: 'Hiragino Kaku Gothic ProN','ヒラギノ角ゴ ProN W3','YuGothic','Yu Gothic','メイリオ', 'Meiryo','ＭＳ ゴシック',sans-serif;
     background-color: #fff;
@@ -83,8 +85,14 @@ h2 {
 }
 
 .sec2 p,
-.sec3 p {
+.sec3 p,
+.sec4 {
     font-size: 18px;
+    line-height: 20px;
+}
+
+tbody tr td:first-of-type {
+    width: 40%;
 }
 
 .sec3 p {
@@ -97,6 +105,7 @@ h2 {
 
 .sec ul li {
     margin: 15px 0 0 0;
+    line-height: 20px;
 }
 
 img.post-it {
@@ -116,6 +125,48 @@ footer {
     line-height: 50px;
     text-align: center;
     font-size: 14px;
+}
+
+.sec4 .explanation tbody,
+.sec4 .explanation td,
+.sec4 .explanation th{
+    border: 1px solid #aaa;
+    background-color: paleturquoise;
+}
+
+.sec4 .explanation table {
+    border-collapse: collapse;
+    display: inline-block;
+    width: 70%;
+}
+
+.sec4 thead,
+.sec4 th {
+    background-color: #bbb !important;
+    color: #fff;
+}
+
+.sec4 .explanation img {
+    width: 15%;
+}
+
+.sec4 .explanation td {
+    font-size: 70%;
+    font-weight: bold;
+    height: 40px;
+    padding: 0 2px;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.sec4 .share-table {
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.sec4 th {
+    font-size: 80%;
 }
 
 @media (max-width: 1000px) {
@@ -138,6 +189,7 @@ footer {
         width: 100%;
         min-height: 400px;
         height: auto;
+        object-position: 70%;
     }
 
     .sec2 {
@@ -199,5 +251,9 @@ footer {
 
     ul li {
         font-size: 14px;
+    }
+
+    .sec4 table {
+        font-size: 60%;
     }
 }

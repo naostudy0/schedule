@@ -34,8 +34,47 @@
 
             <div class="content">
                 <section class="sec1">
-                    <img src="{{ asset('image/schedule_1280.jpg') }}" alt="予定表">
+                    <img src="{{ asset('image/schedule.jpg') }}" alt="予定表">
                 </section><!-- sec1 -->
+            
+                <section class="sec sec4">
+                    <h2>予定を共有</h2>
+                    <div class="explanation">
+                        <p>予定は個別に共有設定可能。仕事もプライベートも一括管理できます。</p>
+                        <div class="share-table">
+                        <img class="main-person" src="{{ asset('image/youngman_29.png') }}" alt="男性">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>内容</th>
+                                        <th>共有する人</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>仕事の予定</td>
+                                        <td>共有しない</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="box">子供のプレゼントを買う</td>
+                                        <td><img src="{{ asset('image/youngwoman_45.png') }}" alt="女性"></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>パーティーの予定</td>
+                                        <td>
+                                            <img src="{{ asset('image/youngwoman_45.png') }}" alt="女性">
+                                            <img src="{{ asset('image/boy_11.png') }}" alt="男の子">
+                                            <img src="{{ asset('image/girl_14.png') }}" alt="女の子">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                </section><!-- sec4 -->
 
                 <section class="sec sec2">
                     <h2>予定を色分けして管理</h2>

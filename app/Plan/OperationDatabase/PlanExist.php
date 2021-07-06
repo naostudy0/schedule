@@ -4,15 +4,16 @@ namespace App\Plan\OperationDatabase;
 
 use Illuminate\Support\Facades\Crypt;
 use App\Models\Plan;
+use App\User;
 use Auth;
 
 class PlanExist
 {
-    private array $request_all;
-    private string $plan_id;
-    private int $user_id;
-    private bool $exist;
-    private object $record;
+    private $request_all;
+    private $plan_id;
+    private $user_id;
+    private $exist;
+    private $record;
 
     /**
      * 予定の更新や削除の時に送信された予定のidが、ログインしているユーザが登録したデータかどうかを判定する
@@ -41,7 +42,7 @@ class PlanExist
         return $this->exist;
     }
 
-    protected array $record_array;
+    protected $record_array;
 
     /**
      * idを再度暗号化、content、detailを復号化してレコードを配列で返す
@@ -54,6 +55,7 @@ class PlanExist
 
         $this->record_array['id'] = Crypt::encrypt($this->record_array['id']);
         $this->record_array['content'] = Crypt::decrypt($this->record_array['content']);
+        
         if($this->record_array['detail']){
             $this->record_array['detail'] = Crypt::decrypt($this->record_array['detail']);
         }
