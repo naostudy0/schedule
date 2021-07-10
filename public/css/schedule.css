@@ -424,52 +424,52 @@ li.nav-list a:hover {
 
 
 .plan .tag .color {
-  width: 100%;
-  border: 1px solid #aaa;
-  border-radius: 0 4px 4px 4px;
-  line-height: 40px;
-  text-align: center;
+    width: 100%;
+    border: 1px solid #aaa;
+    border-radius: 0 4px 4px 4px;
+    line-height: 40px;
+    text-align: center;
 }
 
 .plan .tag .color span {
-  display: inline-block;
-  height: 1.5em;
-  line-height: 1.5em;
-  margin-left: 2px;
+    display: inline-block;
+    height: 1.5em;
+    line-height: 1.5em;
+    margin-left: 2px;
 }
 
 .plan .tag {
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 .plan .tag input {
-  margin-left: 10px;
+    margin-left: 10px;
 }
 
 .plan .tag span {
-  color: #fff;
-  border-radius: 4px;
-  padding: 0 5px;
+    color: #fff;
+    border-radius: 4px;
+    padding: 0 5px;
 }
 
 .plan .tag span.color1 {
-  background-color: pink;
+    background-color: pink;
 }
 
 .plan .tag span.color2 {
-  background-color: orange;
+    background-color: orange;
 }
 
 .plan .tag span.color3 {
-  background-color: palegreen;
+    background-color: palegreen;
 }
 
 .plan .tag span.color4 {
-  background-color: skyblue;
+    background-color: skyblue;
 }
 
 .plan .tag span.color5 {
-  background-color: tomato;
+    background-color: tomato;
 }
 
 .plan .tag span.color6 {

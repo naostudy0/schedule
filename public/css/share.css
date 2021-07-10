@@ -1,5 +1,10 @@
 @charset "UTF-8";
 
+.share {
+    width: 800px;
+    margin: 0 auto;
+}
+
 .share h3 {
     color: #999;
     border-left: 5px solid #999;
@@ -24,9 +29,10 @@
 }
 
 .share .attention-wrap {
-    background-color: #efefef;
+    margin-top: 10px;
     border-radius: 4px;
     padding: 5px;
+    background-color: #efefef;
 }
 
 .share .attention {
@@ -45,22 +51,24 @@
 }
 
 .share .part {
+    margin-bottom: 18px;
     border: 1px solid #999;
     border-radius: 10px;
     padding: 10px 20px;
-    margin-bottom: 18px;
 }
 
 .share dd {
+    margin-left: 20px;
     font-size: 20px;
     font-weight: bold;
     color: #32CD32;
-    margin-left: 20px;
+    word-break: break-all;
 }
 
 .share div.share-users {
-    border-top: 1px #444 solid;
+    border-top: 1px #444 dashed;
     padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 .share div.share-users:first-of-type {
@@ -111,16 +119,23 @@
 }
 
 .share .permission-btn {
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
-.share .share-users-inner {
+.share .id-change-inner {
     float: left;
 }
 
-@media (max-width: 500px) {
-    .share .share-users-inner {
-        float: none;
+@media (max-width: 800px) {
+    .share {
+        width: 95%;
+    }
+}
+
+@media (max-width: 600px) {
+    .share h3 {
+        font-size: 20px;
+        line-height: 20px;
     }
 
     .share button {
@@ -129,5 +144,38 @@
 
     .share input {
         width: 100%;
+    }
+
+    .share section {
+        width: 100%;
+    }
+
+    .share .appear dl {
+        margin-bottom: 0;
+    }
+
+    .share .share-users dl {
+        width: 100%;
+    }
+
+    .share .id-change-inner {
+        float: none;
+    }
+
+    .share .id-change button {
+        float: right;
+    }
+
+    .share .id-change-inner button {
+        margin-top: 10px;
+    }
+
+    .share .attention-wrap {
+        clear: both;
+    }
+
+    .share .btn-search {
+        margin: 10px 20px 0 0;
+        float: right;
     }
 }
