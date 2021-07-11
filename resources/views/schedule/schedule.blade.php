@@ -51,7 +51,7 @@
                         @if( $plan['start_date'] ===  $plan_day['start_date'] )
                             @if( $plan['user_id'] == Auth::id() )
                                 <div class="plan-wrap {{ $plan['color'] }}" style="background-color: {{ $plan['color'] }};">
-                                    <section class="plan">
+                                    <section class="plan-sec">
                                         <div class="plan-main">
                                             <i class="fas fa-angle-double-down float-right"></i>
                                             <p class="datetime">
