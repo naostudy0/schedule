@@ -223,7 +223,7 @@ li.nav-list a:hover {
     font-weight: 600;
 }
 
-.plan-list .plan {
+.plan-list .plan-sec {
     margin: 0 0 0 auto;
     border-radius: 0 4px 4px 0;
     width: 90%;
@@ -313,11 +313,11 @@ li.nav-list a:hover {
     background-color: aliceblue;
 }
 
-.plan-list .share-users {
+.plan-list .plan-list-share-users {
     margin: 0 5px 5px 5px;
 }
 
-.plan-list .share-users p {
+.plan-list .plan-list-share-users p {
     margin-bottom: 2px;
 }
 
@@ -350,6 +350,25 @@ li.nav-list a:hover {
     color: #888;
 }
 
+.plan {
+    width: 800px;
+    margin: 0 auto;
+}
+
+.plan .create-form {
+    padding: 10px;
+}
+
+.plan .hide {
+    display: none;
+}
+
+.plan-datetime {
+    display: inline-flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
 .plan-datetime label.datetime {
     width: 16%;
     color: #fff;
@@ -375,7 +394,9 @@ li.nav-list a:hover {
     align-items: center !important;
 }
 
-.plan-datetime .start-end {
+.plan .plan-datetime .start-end {
+    display: inline-block;
+    width: 48%;
     background-color: #aaa;
     border-radius: 4px;
 }
@@ -387,41 +408,6 @@ li.nav-list a:hover {
     border-radius: 0 4px 4px 0;
     text-align: center;
 }
-
-@media (max-width: 991px) {
-    .plan-datetime .start-end {
-        margin-bottom: 20px;
-    }
-
-    .plan .tag .color {
-        height: auto;
-        font-size: 12px;
-    }
-
-    .plan .tag .color span {
-        width:22%;
-    }
-}
-
-@media (min-width: 992px) {
-    .plan-datetime {
-        margin-bottom: 20px;
-    }
-
-    .br-min-992 {
-        display: none !important;
-    }
-
-    .plan .tag .color {
-        height: 40px;
-
-    }
-
-    .plan .tag input:first-of-type {
-        margin-left: 0;
-    }
-}
-
 
 .plan .tag .color {
     width: 100%;
@@ -479,7 +465,7 @@ li.nav-list a:hover {
 .plan .content label ,
 .plan .detail label,
 .plan .tag label,
-.plan .share h2 {
+.plan .share-users-wrap h2 {
     border: 1px solid #aaa;
     border-bottom: 0px;
     margin-bottom: 0;
@@ -513,7 +499,7 @@ li.nav-list a:hover {
     padding: 5px 10px;
 }
 
-.plan .share_users {
+.plan .share-users {
     background-color: #fff;
     margin-bottom: 15px;
     width: 100%;
@@ -523,7 +509,7 @@ li.nav-list a:hover {
     text-align: center;
 }
 
-.plan .share input,
+.plan .share-users-wrap input,
 .plan .color input {
     height: auto;
     margin: 3px 5px 0 10px;
@@ -543,6 +529,73 @@ li.nav-list a:hover {
 
 .plan .color {
     background-color: #fff;
+}
+
+.plan .input-wrap {
+    width: auto;
+    margin: 0 20px;
+}
+
+.plan .share-checkbox {
+    text-align: left;
+}
+
+
+
+@media (max-width: 991px) {
+    .plan-datetime .start-end {
+        margin-bottom: 20px;
+        font-size: 12px;
+    }
+
+    .plan .tag .color {
+        height: auto;
+        font-size: 12px;
+    }
+}
+
+@media (min-width: 992px) {
+    .plan-datetime {
+        margin-bottom: 20px;
+    }
+
+    .br-min-992 {
+        display: none !important;
+    }
+
+    .plan .tag .color {
+        height: 40px;
+
+    }
+
+    .plan .tag input:first-of-type {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 800px) {
+    .plan {
+        width: 95%;
+    }
+}
+
+@media (max-width: 600px) {
+    .plan .plan-datetime .start-end {
+        width: 100%;
+    }
+
+    .plan-datetime {
+        display: block;
+        width: 100%;
+    }
+
+    .plan .color-input {
+        width: auto;
+    }
+
+    .plan .share-users {
+        font-size: 12px;
+    }
 }
 
 /*---------------- 入力確認画面 ----------------*/
