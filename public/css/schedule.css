@@ -109,6 +109,10 @@ li.nav-list a:hover {
     color: blue;
 }
 
+.calendar table td.today {
+    background-color: rgba(132, 254, 250, 0.539);
+}
+
 .calendar table td {	
     border: solid 1px #999;
     padding: 0;
@@ -313,11 +317,11 @@ li.nav-list a:hover {
     background-color: aliceblue;
 }
 
-.plan-list .plan-list-share-users {
+.plan-list .share-users {
     margin: 0 5px 5px 5px;
 }
 
-.plan-list .plan-list-share-users p {
+.plan-list .share-users p {
     margin-bottom: 2px;
 }
 

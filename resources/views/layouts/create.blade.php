@@ -122,7 +122,6 @@ $(function(){
     $('#allow').on('click', function(){
         $('#share-checkbox').slideToggle(this.checked);
     });
-
     $('#disallow').on('click', function(){
         $('#share-checkbox').slideToggle(this.checked);
     });

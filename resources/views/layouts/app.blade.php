@@ -17,11 +17,11 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') . '?' . date('Ymd') }}" rel="stylesheet">
-    <link href="{{ asset('css/register.css') . '?' . date('Ymd') }}" rel="stylesheet">
-    <link href="{{ asset('css/schedule.css') . '?' . date('Ymd') }}" rel="stylesheet">
-    <link href="{{ asset('css/customer.css') . '?' . date('Ymd') }}" rel="stylesheet">
-    <link href="{{ asset('css/share.css') . '?' . date('Ymd') }}" rel="stylesheet">
+    <link href="{{ asset('css/app.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+    <link href="{{ asset('css/register.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+    <link href="{{ asset('css/schedule.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+    <link href="{{ asset('css/customer.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+    <link href="{{ asset('css/share.css') }}?{{ date('Ymd') }}" rel="stylesheet">
     @yield('style')
 </head>
 <body>

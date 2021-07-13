@@ -71,7 +71,7 @@
                                             </div><!-- detail -->
 
                                             @if($plan['share_user_id'])
-                                            <div class="plan-list-share-users">
+                                            <div class="share-users">
                                                 <p>
                                                     この予定は、<br>
                                                 
@@ -93,7 +93,7 @@
                                 </div><!-- plan_wrap -->
                             @else
                                 <div class="plan-wrap {{ $plan['color'] }}" style="background-color: {{ $plan['color'] }};">
-                                    <section class="plan-sec">
+                                    <section class="plan">
                                         <div class="plan-main plan-share">
                                             <i class="fas fa-angle-double-down float-right"></i>
                                             <p class="datetime">
@@ -111,7 +111,7 @@
                                                 <p>{{$plan['detail']}}</p>
                                             </div><!-- detail -->
 
-                                            <div class="plan-list-share-users">
+                                            <div class="share-users">
                                                 <p><span class="user-name">{{$plan['name']}}</span>さんにより追加されました</p><br>
                                                 <p>
                                                     この予定は、<br>
