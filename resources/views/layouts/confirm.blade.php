@@ -34,20 +34,22 @@
                                             <span class="detail"><span class="table">{{ $plan_data['detail'] }}</span></span>
                                         </li>
 
-                                        <div class="share-users">
-                                        @if( array_key_exists('share_users', $plan_data))
-                                            @if($plan_data['share_users'] == 0)
-                                                <p>■共有しない</p>
-                                            @elseif ($plan_data['share_users'] == 1)
-                                                <p>■共有するユーザー</p>
-                                                <ul>
-                                                @foreach ($share_user_name as $name)
-                                                    <li>{{ $name }}</li>
-                                                @endforeach
-                                                </ul>
+                                        @if ( auth()->user()->share_user_id )
+                                            <div class="share-users">
+                                            @if( array_key_exists('share_users', $plan_data))
+                                                @if($plan_data['share_users'] == 0)
+                                                    <p>■共有しない</p>
+                                                @elseif ($plan_data['share_users'] == 1)
+                                                    <p>■共有するユーザー</p>
+                                                    <ul>
+                                                    @foreach ($share_user_name as $name)
+                                                        <li>{{ $name }}</li>
+                                                    @endforeach
+                                                    </ul>
+                                                @endif
                                             @endif
+                                            </div>
                                         @endif
-                                        </div>
                                     </ul>
 
                                     <form method="POST">
