@@ -46,7 +46,7 @@
 
             @foreach( $plan_days as $plan_day )
                 <div class="plans-oneday">
-                    <h3>{{ str_replace('-', '/', $plan_day['start_date']) }}</h3>
+                    <h3>{{ str_replace('-', '/', $plan_day['start_date']) . ' ' . $plan_day['day_of_the_week']}}</h3>
                     @foreach( $plans as $plan )
                         @if( $plan['start_date'] ===  $plan_day['start_date'] )
                             @if( $plan['user_id'] == Auth::id() )
