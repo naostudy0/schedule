@@ -93,7 +93,7 @@
                                 </div><!-- plan_wrap -->
                             @else
                                 <div class="plan-wrap {{ $plan['color'] }}" style="background-color: {{ $plan['color'] }};">
-                                    <section class="plan">
+                                    <section class="plan-sec">
                                         <div class="plan-main plan-share">
                                             <i class="fas fa-angle-double-down float-right"></i>
                                             <p class="datetime">
