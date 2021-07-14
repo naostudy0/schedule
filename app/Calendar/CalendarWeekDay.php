@@ -30,9 +30,10 @@ class CalendarWeekDay
         // 祝日判定（クラスが複数になるため要半角スペース） 
         $this->holidays = Yasumi::create("Japan", $this->carbon->format('Y') ,"ja_JP");
         $this->holidays->isHoliday($this->carbon) ? $holiday = " " . "holiday" : $holiday = '';
-
+        
         // 当日判定（クラスが複数になるため要半角スペース） 
-        $this->carbon->isToday() ? $today = " " . "today" : $today = '';
+        $carbon_today = Carbon::today();
+        $this->carbon->format('Ymd') == $carbon_today->format('Ymd') ? $today = " " . "today" : $today = '';
 
         return "day-" . strtolower($this->carbon->format("D")) . $holiday . $today;
     }
