@@ -90,6 +90,26 @@ class PlanView
         // 日付を昇順で並び替え
         array_multisort($this->plan_days);
 
+        // 曜日
+        $week_number = [
+            '(日)', //0
+            '(月)', //1
+            '(火)', //2
+            '(水)', //3
+            '(木)', //4
+            '(金)', //5
+            '(土)', //6
+        ];
+
+        // 日付に曜日のデータを追加
+        $days_count = 0;
+        foreach ($this->plan_days as $plan_day) {
+            $day = str_replace('-', '', $plan_day['start_date']);
+            $date_number = date('w', strtotime($day));
+            $this->plan_days[$days_count]['day_of_the_week'] = $week_number[$date_number]; 
+            $days_count++;
+        }
+
 
         // ------- カラー ------
 
