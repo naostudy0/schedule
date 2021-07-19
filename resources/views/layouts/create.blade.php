@@ -29,22 +29,24 @@
                             value="{{ old('end_time', substr($plan_data['end_time'], 0, 5)) }}"><br>
                     </div><!-- start-end flex-center-wrapper -->
 
-                    @if ($errors->has('start_date'))
-                    <p class="text-danger">{{ $errors->first('start_date') }}</p>
-                    @endif
-
-                    @if ($errors->has('start_time'))
-                    <p class="text-danger">{{ $errors->first('start_time') }}</p>
-                    @endif
-
-                    @if ($errors->has('end_date'))
-                    <p class="text-danger">{{ $errors->first('end_date') }}</p>
-                    @endif  
-
-                    @if ($errors->has('end_time'))
-                    <p class="text-danger">{{ $errors->first('end_time') }}</p>
-                    @endif
                 </div><!-- plan-datetime -->
+
+                @if ($errors->has('start_date'))
+                <p class="text-danger">{{ $errors->first('start_date') }}</p>
+                @endif
+
+                @if ($errors->has('start_time'))
+                <p class="text-danger">{{ $errors->first('start_time') }}</p>
+                @endif
+
+                @if ($errors->has('end_date'))
+                <p class="text-danger">{{ $errors->first('end_date') }}</p>
+                @endif  
+
+                @if ($errors->has('end_time'))
+                <p class="text-danger">{{ $errors->first('end_time') }}</p>
+                @endif
+
 
                 <div class="tag">
                     <label for="color">タグ</label>
