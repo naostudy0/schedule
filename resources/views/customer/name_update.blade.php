@@ -31,5 +31,5 @@ onclick="clickEvent();">更新</button>
 
 
 @section('btn_footer')
-<a href="{{ route('customer.show') }}" class="btn btn-secondary">戻る</a>
+<a href="{{ route('customer.index') }}" class="btn btn-secondary">戻る</a>
 @endsection

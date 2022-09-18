@@ -48,8 +48,8 @@ class RegisterController extends Controller
     /**
      * 入力されたメールアドレスをバリデーション
      *
-     * @param  array  $data
-     * @return Validator
+     * @param  array $data
+     * @return \Illuminate\Contracts\Validation\Validator
      */
     protected function validator(array $data)
     {
@@ -60,11 +60,13 @@ class RegisterController extends Controller
 
     /**
      * 入力されたメールアドレスをバリデーションして、確認画面を表示
-     * 
+     *
+     * @param  \Illuminate\Http\Request
+     * @return \Illuminate\View\View
      */
     public function pre_check(Request $request)
-    {    
-        if(!User::where('email', $request->email)->exists() || User::where('email', $request->email)->where('status', '1')->exists()){
+    {
+        if (! User::where('email', $request->email)->exists() || User::where('email', $request->email)->where('status', '1')->exists()) {
             $this->validator($request->all())->validate();
         }
 
@@ -77,8 +79,8 @@ class RegisterController extends Controller
     /**
      * Create a new user instance after a valid registration.
      *
-     * @param  array  $data
-     * @return User
+     * @param  array $data
+     * @return App\User
      */
     protected function create(array $data)
     {
@@ -92,82 +94,92 @@ class RegisterController extends Controller
 
     /**
      * 入力されたメールアドレスが新規ユーザか確認
-     * 
+     *
+     * @param  \Illuminate\Http\Request
+     * @return \Illuminate\View\View
      */
     public function register(Request $request)
     {
         // 既に本登録済みのメールアドレスの場合（以前の画面が残っていた場合などに発生）
-        if((User::where('email', $request->email)->where('status', '1')->exists())){
+        if ((User::where('email', $request->email)->where('status', '1')->exists())) {
             return view('auth.login');
-        } 
-        
+        }
+
         // 退会済みユーザの場合
-        if (User::where('email', $request->email)->where('status', '9')->exists()){
+        if (User::where('email', $request->email)->where('status', '9')->exists()) {
             $user = User::where('email', $request->email)->first();
             $user->status = '0';
             $user->save();
 
         // 新規ユーザの場合
         } else {
-            event(new Registered($user = $this->create( $request->all() )));
+            event(new Registered($user = $this->create($request->all())));
         }
 
         $email = new EmailVerification($user);
         Mail::to($user->email)->send($email);
+
         return view('auth.registered');
     }
 
     /**
      * クエリパラメータのtokenとDBのemail_verify_tokenを照らし合わせて一致すれば本会員登録画面へ
-     * 
+     *
+     * @param  \Illuminate\Http\Request
+     * @return \Illuminate\View\View
      */
     public function showForm($email_token)
     {
         // 登録されたemail_verify_tokenと一致するものがない場合
-        if (!User::where('email_verify_token',$email_token)->exists()) {
+        if (! User::where('email_verify_token',$email_token)->exists()) {
             return view('auth.main.register')->with('message', '無効なトークンです。');
-        } else {
-            $user = User::where('email_verify_token', $email_token)->first();
+        }
 
-            // 既に本登録されている場合
-            if ($user->status == config('const.USER_STATUS.REGISTER')) {
-                logger("status". $user->status );
-                return view('auth.main.register')->with('message', 'すでに本登録されています。ログインして利用してください。');
-            }
+        $user = User::where('email_verify_token', $email_token)->first();
 
-            // statusを更新して本登録画面へ
-            $user->status = config('const.USER_STATUS.MAIL_AUTHED');
-            try {
-                $user->save();
-                return view('auth.main.register', compact('email_token'));
-            } catch (Exception $e) {
-                return view('auth.main.register')->with('message', 'メール認証に失敗しました。再度、メールに記載されたリンクをクリックしてください。');
-            }
+        // 既に本登録されている場合
+        if ($user->status == config('const.USER_STATUS.REGISTER')) {
+            logger("status". $user->status );
+            return view('auth.main.register')->with('message', 'すでに本登録されています。ログインして利用してください。');
+        }
+
+        // statusを更新して本登録画面へ
+        $user->status = config('const.USER_STATUS.MAIL_AUTHED');
+        try {
+            $user->save();
+            return view('auth.main.register', compact('email_token'));
+        } catch (Exception $e) {
+            return view('auth.main.register')->with('message', 'メール認証に失敗しました。再度、メールに記載されたリンクをクリックしてください。');
         }
     }
 
     /**
      * 「名前」「パスワード」をバリデーションして確認画面へ遷移
-     * 
+     *
+     * @param  \Illuminate\Http\Request
+     * @return \Illuminate\View\View
      */
     public function mainCheck(Request $request)
     {
-      $request->validate([
-        'name' => 'required|string',
-        'password' => ['required', 'string', 'min:8', 'confirmed'],
-      ]);
+        $request->validate([
+            'name' => 'required|string',
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
 
-      $email_token = $request->email_token;
-  
-      $user = new User();
-      $user->name = $request->name;
-      $user->password = $request->password;
-      return view('auth.main.register_check', compact('user','email_token'));
+        $email_token = $request->email_token;
+
+        $user = new User();
+        $user->name = $request->name;
+        $user->password = $request->password;
+
+        return view('auth.main.register_check', compact('user','email_token'));
     }
 
     /**
      * email_verify_tokenが一致するレコードにユーザ情報を登録
-     * 
+     *
+     * @param  \Illuminate\Http\Request
+     * @return \Illuminate\View\View
      */
     public function mainRegister(Request $request)
     {

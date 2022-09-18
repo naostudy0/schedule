@@ -69,8 +69,8 @@
                                 
                                     <p class="user-name">{{ Auth::user()->name }}さん</p>
 
-                                    <a class="dropdown-item" href="{{ route('customer.show') }}"
-                                       onclick="location.href='{{ route('customer.show') }}'";>
+                                    <a class="dropdown-item" href="{{ route('customer.index') }}"
+                                       onclick="location.href='{{ route('customer.index') }}'";>
                                         会員情報確認
                                     </a>
 

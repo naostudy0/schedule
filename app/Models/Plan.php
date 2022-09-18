@@ -6,12 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Plan extends Model
 {
-    // テーブル名
+    /**
+     * @var string
+     */
     protected $table = 'plans';
 
-    // 可変項目
-    protected $fillable = 
-    [
+    /**
+     * @var array
+     */
+    protected $fillable = [
         'user_id',
         'start_date',
         'start_time',
@@ -22,6 +25,11 @@ class Plan extends Model
         'share_user_id',
     ];
 
+    /**
+     * 予定を登録したユーザーを取得
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function user()
     {
         return $this->belongsTo('App\User');
