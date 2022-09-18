@@ -5,7 +5,7 @@ namespace App\Share;
 use App\Share\OperationDatabase\ShareIdRandomStore;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
-use App\User;
+use App\Models\User;
 use Auth;
 
 class ChangeStatus

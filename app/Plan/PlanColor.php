@@ -4,40 +4,21 @@ namespace App\Plan;
 
 class PlanColor
 {
-    private $color_checked;
-    private $i;
-
-    /**
-     * ラジオボタンのチェック判定用の変数を初期化
-     * 
-     */
-    public function __construct()
-    {
-        for ($this->i = 1; $this->i <= 6; $this->i++) {
-            $this->color_checked[$this->i] = ''; 
-        }
-    }
-
-    /**
-     * カラー1をcheckedにして配列を返す
-     * 
-     * @return array
-     */
-    public function getInitialize()
-    {
-        $this->color_checked[1] = 'checked';
-        return $this->color_checked;
-    }
-
     /**
      * 渡された番号のカラーをcheckedにして配列を返す
      * 
-     * @param int
+     * @param  int
      * @return array
      */
-    public function getRedisplayData($color_number)
+    public function getColor(int $color_number = 1)
     {
-        $this->color_checked[$color_number] = 'checked';
-        return $this->color_checked;
+        // 使用できる色の数
+        $colors_count = count(config('const.plan_color'));
+
+        for ($i = 1; $i <= $colors_count; $i++) {
+            $color_checked[$i] = $i === $color_number ? 'checked' : ''; 
+        }
+
+        return $color_checked;
     }
 }

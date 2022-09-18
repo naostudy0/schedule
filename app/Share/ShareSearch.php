@@ -4,7 +4,7 @@ namespace App\Share;
 
 use Illuminate\Support\Facades\Validator;
 use App\Share\ShareIdExist;
-use App\User;
+use App\Models\User;
 use Auth;
 
 class ShareSearch

@@ -3,7 +3,7 @@
 namespace App\Share;
 
 use Illuminate\Support\Facades\Crypt;
-use App\User;
+use App\Models\User;
 
 class ShareIdRandom
 {

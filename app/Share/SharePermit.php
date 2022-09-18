@@ -5,7 +5,7 @@ namespace App\Share;
 use Illuminate\Support\Facades\Validator;
 use App\Share\OperationDatabase\ShareReqeustExist;
 use App\Share\OperationDatabase\SharePermitStore;
-use App\User;
+use App\Models\User;
 use Auth;
 
 class SharePermit

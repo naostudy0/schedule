@@ -3,7 +3,7 @@
 namespace App\Share;
 
 use App\Models\ShareRequest;
-use App\User;
+use App\Models\User;
 use Auth;
 
 class ShareSendDelete

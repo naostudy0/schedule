@@ -26,11 +26,11 @@ class PlanController extends Controller
      */
     public function planCreate(Request $request)
     {
-        $plan_create = new PlanCreate($request);
-        $plan_data = $plan_create->getInitialize();
+        $plan_create = new PlanCreate();
+        $plan_data = $plan_create->getInitialize($request);
 
         $plan_color = new PlanColor;
-        $color_checked = $plan_color->getInitialize();
+        $color_checked = $plan_color->getColor();
 
         return view('plan.create',[
             'plan_data' => $plan_data,
@@ -134,7 +134,7 @@ class PlanController extends Controller
         $plan_data['share_users'] = $plan_share->getData();
 
         $plan_color = new PlanColor;
-        $color_checked = $plan_color->getRedisplayData($plan_data['color']);
+        $color_checked = $plan_color->getColor($plan_data['color']);
 
         return view('plan.update', [
             'plan_data' => $plan_data,

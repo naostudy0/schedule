@@ -5,7 +5,7 @@ namespace App\Share;
 use App\Share\ShareIdChange;
 use App\Share\ShareIdExist;
 use App\Share\OperationDatabase\SharePermitDelete;
-use App\User;
+use App\Models\User;
 use Auth;
 
 class ShareDelete

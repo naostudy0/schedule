@@ -3,7 +3,7 @@
 namespace App\Share\OperationDatabase;
 
 use App\Models\ShareRequest;
-use App\User;
+use App\Models\User;
 use Auth;
 
 class ShareReqeustExist

@@ -5,7 +5,7 @@ namespace App\Share;
 use App\Share\ShareIdExist;
 use App\Share\OperationDatabase\ShareReqeustExist;
 use App\Models\ShareRequest;
-use App\User;
+use App\Models\User;
 use Auth;
 
 class ShareSend

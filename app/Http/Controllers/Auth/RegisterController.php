@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
-use App\User;
+use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -80,7 +80,7 @@ class RegisterController extends Controller
      * Create a new user instance after a valid registration.
      *
      * @param  array $data
-     * @return App\User
+     * @return App\Models\User
      */
     protected function create(array $data)
     {
@@ -138,13 +138,13 @@ class RegisterController extends Controller
         $user = User::where('email_verify_token', $email_token)->first();
 
         // 既に本登録されている場合
-        if ($user->status == config('const.USER_STATUS.REGISTER')) {
+        if ($user->status == config('const.user_status.register')) {
             logger("status". $user->status );
             return view('auth.main.register')->with('message', 'すでに本登録されています。ログインして利用してください。');
         }
 
         // statusを更新して本登録画面へ
-        $user->status = config('const.USER_STATUS.MAIL_AUTHED');
+        $user->status = config('const.user_status.mail_authed');
         try {
             $user->save();
             return view('auth.main.register', compact('email_token'));
@@ -184,7 +184,7 @@ class RegisterController extends Controller
     public function mainRegister(Request $request)
     {
         $user = User::where('email_verify_token',$request->email_token)->first();
-        $user->status = config('const.USER_STATUS.REGISTER');
+        $user->status = config('const.user_status.register');
         $user->name = $request->name;
         $user->password = Hash::make($request->password);
         $user->email_verified_at = date('Y-m-d H:i:s');

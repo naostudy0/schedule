@@ -2,7 +2,7 @@
 
 namespace App\Share;
 
-use App\User;
+use App\Models\User;
 
 class ShareIdNameGet
 {
