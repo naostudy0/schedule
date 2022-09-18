@@ -6,11 +6,14 @@ use Carbon\Carbon;
 
 class CalendarView
 {
+    /**
+     * @var \Carbon\Carbon
+     */
     private $carbon;
 
     /**
      * Carbonをインスタンス化
-     * 
+     *
      * @param int
      */
     public function __construct($timestamp)
@@ -20,7 +23,7 @@ class CalendarView
 
     /**
      * カレンダーのタイトルを返す
-     * 
+     *
      * @return string
      */
     public function getTitle()
@@ -28,17 +31,14 @@ class CalendarView
         return $this->carbon->format('Y年n月');
     }
 
-    private $html;
-    protected $count = 0;
-
     /**
      * カレンダーを出力する
-     * 
+     *
      * @return string
      */
     public function render()
     {
-        $this->html[] = <<<EOT
+        $html[] = <<<EOT
         <div class="calendar">
             <table class="table">
             <thead>
@@ -57,93 +57,87 @@ class CalendarView
 
         $weeks = $this->getWeeks();
 
-        foreach($weeks as $week){
-            $this->html[] = '<tr class="'.$week->getClassName().'">';
+        $count = 0;
+        foreach ($weeks as $week) {
+            $html[] = '<tr class="'.$week->getClassName().'">';
 
-            $this->count++;
-            $days = $week->getDays($this->count);
+            $count++;
+            $days = $week->getDays($count);
             foreach($days as $day){
-                $this->html[] = '<td class="'.$day->getClassName().'">';
-                $this->html[] = $day->render();
-                $this->html[] = '</td>';
+                $html[] = '<td class="'.$day->getClassName().'">';
+                $html[] = $day->render();
+                $html[] = '</td>';
             }
-            $this->html[] = '</tr>';
+            $html[] = '</tr>';
         }
-    
-        $this->html[] = <<< EOT
+
+        $html[] = <<< EOT
             </tbody>
             </table>
         </div>
         EOT;
 
-        return implode("", $this->html);
+        return implode('', $html);
     }
-
-    protected $weeks;
-    protected $first_day;
-    protected $last_day;
-    protected $tmp_day;
-    protected $week;
-    protected $index = 1;
 
     /**
      * 何週目かを返す
-     * 
+     *
      * @return array
      */
-    protected function getWeeks()
+    private function getWeeks()
     {
-
         // 月初と月末の日付を設定
-        $this->first_day = $this->carbon->copy()->firstOfMonth();
-        $this->last_day = $this->carbon->copy()->lastOfMonth();
+        $first_day = $this->carbon->copy()->firstOfMonth();
+        $last_day = $this->carbon->copy()->lastOfMonth();
 
         // 作業用 月曜日を取得
-        $this->tmp_day = $this->first_day->copy()->addDay(7)->startOfWeek();
+        $tmp_day = $first_day->copy()->addDay(7)->startOfWeek();
 
+        $index = 0;
         // 1週目 (1日が日曜日の場合、後にweeks[0]をgetDays()すると、7日間全て前月の日付となるため除外する)
-        if (!$this->first_day->dayOfWeek == 0){
-            $this->week = new CalendarWeek($this->first_day->copy(), $this->index);
-            $this->weeks[] = $this->week;
-        } else {
-            $this->index = 0;
+        if (! $first_day->dayOfWeek == 0) {
+            $week = new CalendarWeek($first_day->copy(), $index);
+            $weeks[] = $week;
         }
 
         // 月末までループさせる
-        while($this->tmp_day->lte($this->last_day)){
+        while ($tmp_day->lte($last_day)) {
             //週カレンダーViewを作成する
-            $this->index++;
-            $this->week = new CalendarWeek($this->tmp_day, $this->index);
-            $this->weeks[] = $this->week;
-            
+            $index++;
+            $week = new CalendarWeek($tmp_day, $index);
+            $weeks[] = $week;
+
             //次の週の月曜日
-            $this->tmp_day->addDay(7);
+            $tmp_day->addDay(7);
         }
 
-        if ($this->last_day->dayOfWeek == 0) {
-            $this->index++;
-            $this->week = new CalendarWeek($this->tmp_day, $this->index);
-            $this->weeks[] = $this->week;
+        if ($last_day->dayOfWeek == 0) {
+            $index++;
+            $week = new CalendarWeek($tmp_day, $index);
+            $weeks[] = $week;
         }
 
-        return $this->weeks;
+        return $weeks;
     }
 
     /**
      * 翌月
-     * 
+     *
+     * @return string
      */
     public function getNextMonth()
     {
-      return $this->carbon->copy()->addMonthNoOverflow()->format('Y-m');
+        return $this->carbon->copy()->addMonthNoOverflow()->format('Y-m');
     }
 
     /**
      * 前月
-     * 
+     *
+     * @return string
      */
     public function getPreviousMonth()
     {
-      return $this->carbon->copy()->subMonthNoOverflow()->format('Y-m');
+        return $this->carbon->copy()->subMonthNoOverflow()->format('Y-m');
     }
 }
