@@ -2,22 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Requests\PlanRequest;
 use App\Plan\PlanCreate;
-use App\Plan\PlanReCreate;
-use App\Plan\PlanColor;
 use App\Plan\LayoutSet\LayoutSet;
 use App\Plan\OperationDatabase\PlanUpdate;
 use App\Plan\OperationDatabase\PlanStore;
-use App\Plan\OperationDatabase\PlanExist;
 use App\Plan\OperationDatabase\PlanDelete;
 use App\Plan\OperationDatabase\PlanShare;
 use App\Share\ShareIdChange;
 use App\Share\ShareIdNameGet;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
+use App\Models\Plan;
+use Auth;
 
 class PlanController extends Controller
 {
+    /**
+     * @var \App\Models\Plan
+     */
+    private $plan;
+    /**
+     * コンストラクタ
+     */
+    public function __construct()
+    {
+        $this->plan = new Plan;
+    }
     /**
      * 予定作成画面
      *
@@ -26,11 +37,10 @@ class PlanController extends Controller
      */
     public function planCreate(Request $request)
     {
-        $plan_create = new PlanCreate();
+        $plan_create = new PlanCreate;
         $plan_data = $plan_create->getInitialize($request);
 
-        $plan_color = new PlanColor;
-        $color_checked = $plan_color->getColor();
+        $color_checked = $this->getColor();
 
         return view('plan.create',[
             'plan_data' => $plan_data,
@@ -78,12 +88,12 @@ class PlanController extends Controller
      */
     public function planReCreate(Request $request)
     {
-        $plan_recreate = new PlanReCreate($request);
-        $plan_data = $plan_recreate->getData();
+        $plan_data = $request->toArray();
+        $plan_data['cancel_date'] = substr($plan_data['start_date'], 0, 7);
         $plan_share = new PlanShare;
         $plan_data['share_users'] = $plan_share->getData();
 
-        $color_checked = $plan_recreate->getColor();
+        $color_checked = $this->getColor($request->input('color'));
 
         return view('plan.create',[
             'plan_data' => $plan_data,
@@ -120,21 +130,20 @@ class PlanController extends Controller
      */
     public function planUpdate (Request $request)
     {
-        $plan_exist = new PlanExist($request);
-        $exist = $plan_exist->getResult();
+        $plan_id = Crypt::decrypt($request->input('id'));
 
+        $exist = $this->plan->hasPlan($plan_id, Auth::id());
         if (! $exist) {
             \Session::flash('flash_msg', $this->not_exist);
             return redirect()->route('schedule');
         }
 
-        $plan_data = $plan_exist->getRecord();
+        $plan_data = $this->plan->getOneRecord($plan_id);
 
         $plan_share = new PlanShare;
         $plan_data['share_users'] = $plan_share->getData();
 
-        $plan_color = new PlanColor;
-        $color_checked = $plan_color->getColor($plan_data['color']);
+        $color_checked = $this->getColor($plan_data['color']);
 
         return view('plan.update', [
             'plan_data' => $plan_data,
@@ -179,11 +188,11 @@ class PlanController extends Controller
      */
     public function planReUpdate(Request $request)
     {
-        $plan_recreate = new PlanReCreate($request);
-        $plan_data = $plan_recreate->getData();
+        $plan_data = $request->toArray();
+        $plan_data['cancel_date'] = substr($plan_data['start_date'], 0, 7);
         $plan_share = new PlanShare;
         $plan_data['share_users'] = $plan_share->getData();
-        $color_checked = $plan_recreate->getColor();
+        $color_checked = $this->getColor($request->input('color'));
 
         return view('plan.update',[
             'plan_data' => $plan_data,
@@ -217,15 +226,16 @@ class PlanController extends Controller
      */
     public function deleteConfirm(Request $request)
     {
-        $plan_exist = new PlanExist($request);
-        $exist = $plan_exist->getResult();
+        $plan_id = Crypt::decrypt($request->input('id'));
+
+        $exist = $this->plan->hasPlan($plan_id, Auth::id());
 
         if (! $exist) {
             \Session::flash('flash_msg', $this->not_exist);
             return redirect()->route('schedule');
         }
 
-        $plan_data = $plan_exist->getRecord();
+        $plan_data = $this->plan->getOneRecord($plan_id);
         $layout_set = new LayoutSet($plan_data);
 
         if ($plan_data['share_user_id']) {
@@ -253,8 +263,8 @@ class PlanController extends Controller
      */
     public function deleteStore(Request $request)
     {
-        $plan_exist = new PlanExist($request);
-        $exist = $plan_exist->getResult();
+        $plan_id = Crypt::decrypt($request->input('id'));
+        $exist = $this->plan->hasPlan($plan_id, Auth::id());
 
         if (! $exist) {
             \Session::flash('flash_msg', $this->not_exist);
@@ -267,5 +277,23 @@ class PlanController extends Controller
 
         \Session::flash('flash_msg', $result);
         return redirect()->to($date_redirect);
+    }
+
+    /**
+     * 渡された番号のカラーをcheckedにして配列を返す
+     * 
+     * @param  int
+     * @return array
+     */
+    private function getColor(int $color_number = 1)
+    {
+        // 使用できる色の数
+        $colors_count = count(config('const.plan_color'));
+
+        for ($i = 1; $i <= $colors_count; $i++) {
+            $color_checked[$i] = $i === $color_number ? 'checked' : ''; 
+        }
+
+        return $color_checked;
     }
 }
