@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PlanRequest;
-use App\Plan\PlanCreate;
 use App\Plan\LayoutSet\LayoutSet;
 use App\Plan\OperationDatabase\PlanUpdate;
 use App\Plan\OperationDatabase\PlanStore;
@@ -22,6 +21,7 @@ class PlanController extends Controller
      * @var \App\Models\Plan
      */
     private $plan;
+
     /**
      * コンストラクタ
      */
@@ -29,6 +29,7 @@ class PlanController extends Controller
     {
         $this->plan = new Plan;
     }
+
     /**
      * 予定作成画面
      *
@@ -37,12 +38,11 @@ class PlanController extends Controller
      */
     public function planCreate(Request $request)
     {
-        $plan_create = new PlanCreate;
-        $plan_data = $plan_create->getInitialize($request);
+        $plan_data = $this->getInitialize($request);
 
         $color_checked = $this->getColor();
 
-        return view('plan.create',[
+        return view('plan.create', [
             'plan_data' => $plan_data,
             'color_checked' => $color_checked,
         ]);
@@ -295,5 +295,46 @@ class PlanController extends Controller
         }
 
         return $color_checked;
+    }
+
+    /**
+     * views.plan.create用の変数を初期化する
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return array
+     */
+    private function getInitialize($request)
+    {
+        $initialize = [
+            'start_date'  => '',
+            'start_time'  => '00:00',
+            'end_date'    => '',
+            'end_time'    => '00:00',
+            'content'     => '',
+            'detail'      => '',
+            'cancel_date' => '',
+        ];
+
+        // クエリパラメータのチェック
+        $date = $request->input('date');
+
+        // 存在している日付か確認するために分割
+        if ($date) {
+            list($year, $month, $day) = explode('-', $date);
+            // 予定入力前に表示していた月に戻れるように「キャンセル」用のdate作成
+            $cancel_check = $year . '-' . $month;
+
+            // 年月のデータが正しければ変数を更新
+            if ($date && preg_match("/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/", $date) && checkdate($month, $day, $year)) {
+                $initialize['start_date']  = $date;
+                $initialize['end_date']    = $date;
+                $initialize['cancel_date'] = $cancel_check;
+            }
+        }
+
+        $plan_share = new PlanShare;
+        $initialize['share_users'] = $plan_share->getData();
+
+        return $initialize;
     }
 }
