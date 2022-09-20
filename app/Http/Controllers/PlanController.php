@@ -9,6 +9,7 @@ use App\Share\ShareIdChange;
 use App\Share\ShareIdNameGet;
 use Illuminate\Http\Request;
 use App\Models\Plan;
+use App\Models\User;
 use Auth;
 
 class PlanController extends Controller
@@ -38,8 +39,9 @@ class PlanController extends Controller
      */
     public function planCreate(Request $request)
     {
+        // パラメーター初期値
         $plan_data = $this->initialize($request);
-
+        // 色選択の初期値
         $color_checked = $this->getColor();
 
         return view('plan.create', [
@@ -57,17 +59,15 @@ class PlanController extends Controller
     public function planConfirm(PlanRequest $request)
     {
         $plan_data = $request->all();
+        // 共有するユーザーが指定されていない場合は「共有しない」に変更
+        $plan_data['share_users'] = $plan_data['share_user'] ?? 0;
 
-        // 予定共有するにチェックされているが、共有するユーザーが指定されていない場合は共有しないに変更
-        $plan_data['share_user'] ?? $plan_data['share_users'] = 0;
-
+        $share_user_name = null;
         if ($plan_data['share_users'] == 1){
             foreach($plan_data['share_user'] as $share_id){
                 $share_id_change = new ShareIdChange($share_id);
                 $share_user_name[] = $share_id_change->getName();
             }
-        } else {
-            $share_user_name = null;
         }
 
         $layout_set = new LayoutSet($plan_data);
@@ -153,6 +153,9 @@ class PlanController extends Controller
         $layout_set = new LayoutSet($plan_data);
 
         $exist = array_key_exists('share_user', $plan_data);
+        // 共有するユーザーが指定されていない場合は「共有しない」に変更
+        $plan_data['share_users'] = $plan_data['share_user'] ?? 0;
+
         $share_user_name = null;
         if ($exist) {
             foreach ($plan_data['share_user'] as $share_id) {
@@ -197,10 +200,9 @@ class PlanController extends Controller
     {
         $plan_update = new PlanUpdate($request);
         $result = $plan_update->getResult();
-        $date_redirect = $plan_update->getRedirectDate();
+        $redirect_route = $this->getRedirectRoute($request->input('start_date'));
 
-        \Session::flash('flash_msg', $result);
-        return redirect()->to($date_redirect);
+        return redirect($redirect_route)->with('flash_msg', $result);
     }
 
     /**
@@ -333,18 +335,33 @@ class PlanController extends Controller
      * 予定を共有しているユーザーの情報を取得
      * 
      * @return null|array
+     * 
+     * @todo DB構造変更後に要修正
      */
     private function getShareUserData()
     {
         $user = Auth::user();
         $share_user_id = $user->share_user_id;
-
         if (! $share_user_id) {
             return;
         }
 
-        // share_idとnameを配列で取得
-        $share_id_name_get = new ShareIdNameGet($share_user_data);
-        $this->share_users = $share_id_name_get->getData();
+        // 先頭と最後の「,」を除外
+        $len = strlen($share_user_id);
+        $share_users_text = substr($share_user_id, 1, $len - 2);
+        // カンマ区切りになった文字列を配列に変更
+        $users_id = explode(',', $share_users_text);
+
+        $count = 0;
+        foreach($users_id as $user_id){
+            $user = User::where('id', $user_id)->first();
+            $share_users[$count] = [
+                'name'     => $user->name,
+                'share_id' => $user->share_id,
+            ];
+            $count++;
+        }
+
+        return $share_users;
     }
 }
