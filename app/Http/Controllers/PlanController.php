@@ -5,13 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PlanRequest;
 use App\Plan\LayoutSet\LayoutSet;
 use App\Plan\OperationDatabase\PlanUpdate;
-use App\Plan\OperationDatabase\PlanStore;
-use App\Plan\OperationDatabase\PlanDelete;
-use App\Plan\OperationDatabase\PlanShare;
 use App\Share\ShareIdChange;
 use App\Share\ShareIdNameGet;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Crypt;
 use App\Models\Plan;
 use Auth;
 
@@ -21,6 +17,10 @@ class PlanController extends Controller
      * @var \App\Models\Plan
      */
     private $plan;
+    /**
+     * @var string
+     */
+    private $not_exist = '該当の予定が見つかりませんでした。';
 
     /**
      * コンストラクタ
@@ -38,7 +38,7 @@ class PlanController extends Controller
      */
     public function planCreate(Request $request)
     {
-        $plan_data = $this->getInitialize($request);
+        $plan_data = $this->initialize($request);
 
         $color_checked = $this->getColor();
 
@@ -80,8 +80,7 @@ class PlanController extends Controller
     }
 
     /**
-     * 「登録内容確認」画面で「修正」をクリック時
-     * 「予定入力」を再表示する
+     * 登録内容確認画面から予定作成画面の再表示
      *
      * @param  \Illuminate\Http\Request
      * @return \Illuminate\View\View
@@ -90,8 +89,7 @@ class PlanController extends Controller
     {
         $plan_data = $request->toArray();
         $plan_data['cancel_date'] = substr($plan_data['start_date'], 0, 7);
-        $plan_share = new PlanShare;
-        $plan_data['share_users'] = $plan_share->getData();
+        $plan_data['share_users'] = $this->getShareUserData();
 
         $color_checked = $this->getColor($request->input('color'));
 
@@ -102,46 +100,38 @@ class PlanController extends Controller
     }
 
     /**
-     * 「登録内容確認」画面で「登録」をクリック時
-     * 入力した内容をPlanテーブルに保存し、「予定一覧」画面にリダイレクトする
+     * 予定保存処理
      *
      * @param  \App\Http\Requests\PlanRequest
      * @return \Illuminate\Http\RedirectResponse
      */
     public function planStore(PlanRequest $request)
     {
-        $plan_store = new PlanStore($request);
-        $result = $plan_store->getResult();
-        $date_redirect = $plan_store->getRedirectDate();
+        // 予定の保存
+        $this->plan->storePlan($request, Auth::id());
+        // リダイレクト先のURLを取得
+        $date_redirect = $this->getRedirectRoute($request->start_date);
 
-        \Session::flash('flash_msg', $result);
-        return redirect()->to($date_redirect);
+        return redirect($date_redirect)->with('flash_msg', '予定を登録しました。');
     }
 
-
-    private $not_exist = '該当の予定が見つかりませんでした。';
-
     /**
-     * 「予定一覧」画面で修正をクリック時
-     * 「予定修正」画面を表示する
+     * 予定更新画面
      *
      * @param  \Illuminate\Http\Request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
      */
-    public function planUpdate (Request $request)
+    public function planUpdate(Request $request)
     {
-        $plan_id = Crypt::decrypt($request->input('id'));
-
-        $exist = $this->plan->hasPlan($plan_id, Auth::id());
-        if (! $exist) {
-            \Session::flash('flash_msg', $this->not_exist);
-            return redirect()->route('schedule');
+        // 予定が存在していれば予定IDを取得
+        $plan_id = $this->plan->getIdIfExists($request->input('id'), Auth::id());
+        if (! $plan_id) {
+            return redirect()->route('schedule')->with('flash_msg', $this->not_exist);
         }
 
         $plan_data = $this->plan->getOneRecord($plan_id);
 
-        $plan_share = new PlanShare;
-        $plan_data['share_users'] = $plan_share->getData();
+        $plan_data['share_users'] = $this->getShareUserData();
 
         $color_checked = $this->getColor($plan_data['color']);
 
@@ -152,13 +142,12 @@ class PlanController extends Controller
     }
 
     /**
-     * 「予定修正」画面で「確認」をクリック時
-     * 「修正内容確認」画面を表示する
+     * 更新内容確認画面
      *
      * @param  \App\Http\Requests\PlanRequest
      * @return \Illuminate\View\View
      */
-    public function updateConfirm (PlanRequest $request)
+    public function updateConfirm(PlanRequest $request)
     {
         $plan_data = $request->toArray();
         $layout_set = new LayoutSet($plan_data);
@@ -180,8 +169,7 @@ class PlanController extends Controller
     }
 
     /**
-     * 「修正内容確認」画面で「戻る」をクリック時
-     * 「予定修正」画面を再表示する
+     * 修正内容確認画面から予定修正画面の再表示
      *
      * @param  \Illuminate\Http\Request
      * @return \Illuminate\View\View
@@ -190,8 +178,7 @@ class PlanController extends Controller
     {
         $plan_data = $request->toArray();
         $plan_data['cancel_date'] = substr($plan_data['start_date'], 0, 7);
-        $plan_share = new PlanShare;
-        $plan_data['share_users'] = $plan_share->getData();
+        $plan_data['share_users'] = $this->getShareUserData();
         $color_checked = $this->getColor($request->input('color'));
 
         return view('plan.update',[
@@ -201,8 +188,7 @@ class PlanController extends Controller
     }
 
     /**
-     * 「修正内容確認」画面で「登録」をクリック時
-     * 入力した内容をPlanテーブルの該当のレコードに上書きし、「予定一覧」画面にリダイレクトする
+     * 予定更新処理
      *
      * @param  \App\Http\Requests\PlanRequest
      * @return \Illuminate\Http\RedirectResponse
@@ -218,21 +204,17 @@ class PlanController extends Controller
     }
 
     /**
-     * 「予定一覧」画面で「削除」をクリック時
-     * 「削除内容確認」画面を表示する
+     * 削除内容確認画面
      *
      * @param  \Illuminate\Http\Request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
      */
     public function deleteConfirm(Request $request)
     {
-        $plan_id = Crypt::decrypt($request->input('id'));
-
-        $exist = $this->plan->hasPlan($plan_id, Auth::id());
-
-        if (! $exist) {
-            \Session::flash('flash_msg', $this->not_exist);
-            return redirect()->route('schedule');
+        // 予定が存在していれば予定IDを取得
+        $plan_id = $this->plan->getIdIfExists($request->input('id'), Auth::id());
+        if (! $plan_id) {
+            return redirect()->route('schedule')->with('flash_msg', $this->not_exist);
         }
 
         $plan_data = $this->plan->getOneRecord($plan_id);
@@ -255,33 +237,32 @@ class PlanController extends Controller
     }
 
     /**
-     * 「削除内容確認」画面で「削除」をクリック時
-     * 該当のレコードを削除し、「予定一覧」画面にリダイレクトする
+     * 予定削除処理
      *
      * @param  \Illuminate\Http\Request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function deleteStore(Request $request)
     {
-        $plan_id = Crypt::decrypt($request->input('id'));
-        $exist = $this->plan->hasPlan($plan_id, Auth::id());
-
-        if (! $exist) {
-            \Session::flash('flash_msg', $this->not_exist);
-            return redirect()->route('schedule');
+        // 予定が存在していれば予定IDを取得
+        $plan_id = $this->plan->getIdIfExists($request->input('id'), Auth::id());
+        if (! $plan_id) {
+            return redirect()->route('schedule')->with('flash_msg', $this->not_exist);
         }
 
-        $plan_delete = new PlanDelete($request);
-        $result = $plan_delete->getResult();
-        $date_redirect = $plan_delete->getRedirectDate();
+        // リダイレクト先の取得のために削除前にレコードを取得
+        $row = $this->plan->getOneRecord($plan_id);
+        // リダイレクト先の取得
+        $redirect_route = $this->getRedirectRoute($row['start_date']);
 
-        \Session::flash('flash_msg', $result);
-        return redirect()->to($date_redirect);
+        $this->plan->where('id', $plan_id)->delete();
+
+        return redirect($redirect_route)->with('flash_msg', '予定を削除しました');;
     }
 
     /**
      * 渡された番号のカラーをcheckedにして配列を返す
-     * 
+     *
      * @param  int
      * @return array
      */
@@ -291,19 +272,19 @@ class PlanController extends Controller
         $colors_count = count(config('const.plan_color'));
 
         for ($i = 1; $i <= $colors_count; $i++) {
-            $color_checked[$i] = $i === $color_number ? 'checked' : ''; 
+            $color_checked[$i] = $i === $color_number ? 'checked' : '';
         }
 
         return $color_checked;
     }
 
     /**
-     * views.plan.create用の変数を初期化する
+     * 予定作成画面のパラメータ初期値
      *
      * @param  \Illuminate\Http\Request $request
      * @return array
      */
-    private function getInitialize($request)
+    private function initialize($request)
     {
         $initialize = [
             'start_date'  => '',
@@ -332,9 +313,38 @@ class PlanController extends Controller
             }
         }
 
-        $plan_share = new PlanShare;
-        $initialize['share_users'] = $plan_share->getData();
+        $initialize['share_users'] = $this->getShareUserData();
 
         return $initialize;
+    }
+
+    /**
+     * 予定開始日の月にリダイレクトするURLを取得
+     * 
+     * @param  string $start_date [予定開始日]
+     * @return string
+     */
+    private function getRedirectRoute($start_date)
+    {
+        return '/schedule?date=' . substr($start_date, 0, 7);
+    }
+
+    /**
+     * 予定を共有しているユーザーの情報を取得
+     * 
+     * @return null|array
+     */
+    private function getShareUserData()
+    {
+        $user = Auth::user();
+        $share_user_id = $user->share_user_id;
+
+        if (! $share_user_id) {
+            return;
+        }
+
+        // share_idとnameを配列で取得
+        $share_id_name_get = new ShareIdNameGet($share_user_data);
+        $this->share_users = $share_id_name_get->getData();
     }
 }
