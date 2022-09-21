@@ -26,18 +26,8 @@ class ShareShow
             $result ? $this->share['id'] = $user->share_id : $this->share['id'] = '未設定';
         }
 
-
-        // ユーザ検索の検索結果に表示されるかどうか
-        $share_permission = $user->share_permission;
-        // 0:許可しない
-        if($share_permission == 0) {
-            $this->share['msg'] = '許可していません';
-            $this->share['btn'] = '許可する';
-        // 1:許可する
-        } else {
-            $this->share['msg'] = '許可しています';
-            $this->share['btn'] = '許可しない';
-        }
+        $this->share['msg'] = $user->share_permission ? '許可しています' : '許可していません';
+        $this->share['btn'] = $user->share_permission ? '許可しない' : '許可する';
     }
 
     /**
