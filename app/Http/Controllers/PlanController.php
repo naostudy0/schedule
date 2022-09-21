@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PlanRequest;
 use App\Plan\LayoutSet\LayoutSet;
-use App\Share\ShareIdChange;
 use App\Share\ShareIdNameGet;
 use Illuminate\Http\Request;
 use App\Models\Plan;
@@ -69,8 +68,7 @@ class PlanController extends Controller
         $share_user_name = null;
         if ($plan_data['share_users'] == 1){
             foreach($plan_data['share_user'] as $share_id){
-                $share_id_change = new ShareIdChange($share_id);
-                $share_user_name[] = $share_id_change->getName();
+                $share_user_name[] = $this->user->where('share_id', $share_id)->value('name');
             }
         }
 
@@ -163,8 +161,7 @@ class PlanController extends Controller
         $share_user_name = null;
         if ($exist) {
             foreach ($plan_data['share_user'] as $share_id) {
-                $share_id_change = new ShareIdChange($share_id);
-                $share_user_name[] = $share_id_change->getName();
+                $share_user_name[] = $this->user->where('share_id', $share_id)->value('name');
             }
         }
 
@@ -357,7 +354,7 @@ class PlanController extends Controller
 
         $count = 0;
         foreach($users_id as $user_id){
-            $user = User::where('id', $user_id)->first();
+            $user = $this->user->where('id', $user_id)->first();
             $share_users[$count] = [
                 'name'     => $user->name,
                 'share_id' => $user->share_id,

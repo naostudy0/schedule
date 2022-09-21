@@ -2,7 +2,6 @@
 
 namespace App\Share;
 
-use App\Share\ShareIdChange;
 use App\Share\OperationDatabase\SharePermitDelete;
 use App\Models\User;
 use Auth;
@@ -34,8 +33,7 @@ class ShareDelete
             $own_id = Auth::id();
 
             // 相手のshare_idをIDに変換して取得
-            $share_id_change = new ShareIdChange($share_id);
-            $fellow_id = $share_id_change->getId();
+            $fellow_id = User::where('share_id', $share_id)->value('id');
 
             // 自分の共有ユーザ情報から相手のIDを削除した文字列を取得
             $share_delete_own = new SharePermitDelete($own_id, $fellow_id);
