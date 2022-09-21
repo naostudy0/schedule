@@ -270,10 +270,7 @@ class PlanController extends Controller
      */
     private function getColor(int $color_number = 1)
     {
-        // 使用できる色の数
-        $colors_count = count(config('const.plan_color'));
-
-        for ($i = 1; $i <= $colors_count; $i++) {
+        for ($i = 1; $i <= count(config('const.plan_color')); $i++) {
             $color_checked[$i] = $i === $color_number ? 'checked' : '';
         }
 
@@ -352,14 +349,12 @@ class PlanController extends Controller
         // カンマ区切りになった文字列を配列に変更
         $users_id = explode(',', $share_users_text);
 
-        $count = 0;
-        foreach($users_id as $user_id){
+        foreach ($users_id as $user_id) {
             $user = $this->user->where('id', $user_id)->first();
-            $share_users[$count] = [
+            $share_users[] = [
                 'name'     => $user->name,
                 'share_id' => $user->share_id,
             ];
-            $count++;
         }
 
         return $share_users;

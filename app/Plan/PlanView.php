@@ -3,26 +3,23 @@
 namespace App\Plan;
 
 use Illuminate\Support\Facades\Crypt;
-use App\Plan\PlanGet;
 use App\Share\ShareIdNameGet;
 use App\Models\Plan;
-use App\User;
+use App\Models\User;
 use Auth;
 
 class PlanView
 {
     private $user;
-    private $year_month;
     private $plans;
     private $plan;
     private $plan_colors = [];
     private $plan_days;
     private $plans_get;
 
-
     /**
      * 該当月の予定、予定がある日付、設定しているカラーを取得
-     * 
+     *
      * @param string
      */
     public function __construct($year_month)
@@ -53,9 +50,6 @@ class PlanView
 
             if( $plan['detail'] ){
                 $plan['detail'] = Crypt::decrypt($plan['detail']);
-
-            } else {
-                $detail = '';
             }
 
             $share_user_id = $plan['share_user_id'];
@@ -106,7 +100,7 @@ class PlanView
         foreach ($this->plan_days as $plan_day) {
             $day = str_replace('-', '', $plan_day['start_date']);
             $date_number = date('w', strtotime($day));
-            $this->plan_days[$days_count]['day_of_the_week'] = $week_number[$date_number]; 
+            $this->plan_days[$days_count]['day_of_the_week'] = $week_number[$date_number];
             $days_count++;
         }
 
@@ -114,8 +108,8 @@ class PlanView
         // ------- カラー ------
 
         // planテーブルcolorカラムに設定できる定数・名前を取得
-        $tag_colors = config('const.PLAN_COLOR');
-        
+        $tag_colors = config('const.plan_color');
+
         foreach($this->plans as &$this->plan){
             // 修正・削除時に使用するidを暗号化
             $encrypted = encrypt($this->plan['id']);
@@ -135,7 +129,7 @@ class PlanView
 
     /**
      * 該当月の予定を日付順・開始時間順で返す
-     * 
+     *
      * @return array
      */
     public function getPlans()
@@ -145,7 +139,7 @@ class PlanView
 
     /**
      * 該当月の予定のある日付を返す
-     * 
+     *
      * @return array
      */
     public function getPlanDays()
@@ -155,7 +149,7 @@ class PlanView
 
     /**
      * 該当月に使用されている色を定数の昇順で返す
-     * 
+     *
      * @return array
      */
     public function getPlanColors()
@@ -165,20 +159,20 @@ class PlanView
 
     /**
      * 多次元配列を一つのキーの値を基準に並び替える
-     * 
+     *
      * @param string
      * @param string
      * @param array
-     * 
+     *
      * @return array
      */
     function sortByKey($key_name, $sort_order, $array) {
         foreach ($array as $key => $value) {
             $standard_key_array[$key] = $value[$key_name];
         }
-    
+
         array_multisort($standard_key_array, $sort_order, $array);
-    
+
         return $array;
     }
 }
