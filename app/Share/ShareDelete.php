@@ -3,7 +3,6 @@
 namespace App\Share;
 
 use App\Share\ShareIdChange;
-use App\Share\ShareIdExist;
 use App\Share\OperationDatabase\SharePermitDelete;
 use App\Models\User;
 use Auth;
@@ -27,9 +26,7 @@ class ShareDelete
     public function __construct($share_id)
     {
         // 誤ったshare_idを送信された時の処理
-        $share_id_exist = new ShareIdExist($share_id);
-        $exist = $share_id_exist->getResult();
-        if(!$exist){
+        if(! User::where('share_id', $share_id)->exists()){
             $this->result = false;
             $this->msg = '操作に失敗しました。';
 

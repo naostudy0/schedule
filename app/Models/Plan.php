@@ -117,4 +117,36 @@ class Plan extends Model
                 'updated_at'    => Carbon::now(),
             ]);
     }
+
+    /**
+     * 予定の更新処理
+     *
+     * @param \Illuminate\Http\Request $request
+     */
+    public function updatePlan($request)
+    {
+        $share_user_id = null;
+        if ($request->input('share_user')) {
+            foreach ($request->only('share_user') as $share_id){
+                $share_ids[] = DB::table('user')
+                    ->where('share_id', $share_id)
+                    ->value('user_id');
+            }
+            $share_user_id = ',' . implode(',', $share_ids) . ',';
+        }
+
+        $plan_id = Crypt::decrypt($request->input('id'));
+        DB::table($this->table)
+            ->where('id', $plan_id)
+            ->update([
+                'start_date' => $request->start_date,
+                'start_time' => $request->start_time,
+                'end_date' => $request->end_date,
+                'end_time' => $request->end_time,
+                'color' => $request->color,
+                'content' => Crypt::encrypt($request->content),
+                'detail' => Crypt::encrypt($request->detail),
+                'share_user_id' => $share_user_id,
+            ]);
+    }
 }

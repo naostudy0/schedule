@@ -11,9 +11,8 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
+// 非ログインTOP
+Route::view('/', 'index')->name('index');
 
 Auth::routes();
 

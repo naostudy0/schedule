@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PlanRequest;
 use App\Plan\LayoutSet\LayoutSet;
-use App\Plan\OperationDatabase\PlanUpdate;
 use App\Share\ShareIdChange;
 use App\Share\ShareIdNameGet;
 use Illuminate\Http\Request;
@@ -19,6 +18,10 @@ class PlanController extends Controller
      */
     private $plan;
     /**
+     * @var \App\Models\User
+     */
+    private $user;
+    /**
      * @var string
      */
     private $not_exist = '該当の予定が見つかりませんでした。';
@@ -29,6 +32,7 @@ class PlanController extends Controller
     public function __construct()
     {
         $this->plan = new Plan;
+        $this->user = new User;
     }
 
     /**
@@ -198,11 +202,10 @@ class PlanController extends Controller
      */
     public function updateStore(PlanRequest $request)
     {
-        $plan_update = new PlanUpdate($request);
-        $result = $plan_update->getResult();
+        $this->plan->updatePlan($request);
         $redirect_route = $this->getRedirectRoute($request->input('start_date'));
 
-        return redirect($redirect_route)->with('flash_msg', $result);
+        return redirect($redirect_route)->with('flash_msg', '予定を更新しました');
     }
 
     /**
