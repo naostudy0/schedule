@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PlanRequest;
 use App\Plan\LayoutSet\LayoutSet;
-use App\Share\ShareIdNameGet;
 use Illuminate\Http\Request;
 use App\Models\Plan;
 use App\Models\User;
@@ -62,12 +61,10 @@ class PlanController extends Controller
     public function planConfirm(PlanRequest $request)
     {
         $plan_data = $request->all();
-        // 共有するユーザーが指定されていない場合は「共有しない」に変更
-        $plan_data['share_users'] = $plan_data['share_user'] ?? 0;
 
         $share_user_name = null;
-        if ($plan_data['share_users'] == 1){
-            foreach($plan_data['share_user'] as $share_id){
+        if ($request->share_users == 1 && $request->share_user) {
+            foreach ($plan_data['share_user'] as $share_id) {
                 $share_user_name[] = $this->user->where('share_id', $share_id)->value('name');
             }
         }
@@ -154,12 +151,8 @@ class PlanController extends Controller
         $plan_data = $request->toArray();
         $layout_set = new LayoutSet($plan_data);
 
-        $exist = array_key_exists('share_user', $plan_data);
-        // 共有するユーザーが指定されていない場合は「共有しない」に変更
-        $plan_data['share_users'] = $plan_data['share_user'] ?? 0;
-
         $share_user_name = null;
-        if ($exist) {
+        if ($request->share_users == 1 && $request->share_user) {
             foreach ($plan_data['share_user'] as $share_id) {
                 $share_user_name[] = $this->user->where('share_id', $share_id)->value('name');
             }
@@ -224,8 +217,21 @@ class PlanController extends Controller
 
         if ($plan_data['share_user_id']) {
             $plan_data['share_users'] = 1;
-            $share_id_name_get = new ShareIdNameGet($plan_data['share_user_id']);
-            $share_user_name = $share_id_name_get->getName();
+            $share_user_id = $plan_data['share_user_id'];
+
+            $len = strlen($share_user_id);
+            $share_users_text = substr($share_user_id, 1, $len-2);
+
+            // カンマ区切りになった文字列を配列に変更
+            $users_id = explode(',', $share_users_text);
+
+            // 名前のみ
+            foreach($users_id as $user_id){
+                $user = User::where('id', $user_id)->first();
+                $names['name'] = $user['name'];
+            }
+
+            $share_user_name = $names;
         } else {
             $plan_data['share_users'] = 0;
             $share_user_name = null;

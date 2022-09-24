@@ -12,10 +12,26 @@ use App\Share\ShareShow;
 use App\Share\ShareSend;
 use App\Share\ShareDelete;
 use App\Share\ShareSendDelete;
+use App\Models\ShareRequest;
+use App\Models\User;
 use Auth;
 
 class ShareController extends Controller
 {
+    /**
+     * @var \App\Models\User
+     */
+    private $user;
+    /**
+     * @var \App\Models\ShareRequest
+     */
+    private $share_request;
+
+    public function __construct()
+    {
+        $this->user = new User;
+        $this->share_request = new ShareRequest;
+    }
     /**
      * 予定共有管理画面の表示
      *
@@ -64,8 +80,7 @@ class ShareController extends Controller
         $change_status = new ChangeStatus($request);
         $msg = $change_status->getMessage();
 
-        \Session::flash('flash_msg', $msg);
-        return redirect()->to('/share');
+        return redirect()->to('/share')->with('flash_msg', $msg);
     }
 
     /**
@@ -139,11 +154,10 @@ class ShareController extends Controller
         $own_id = Auth::id();
         $share_id = $request->input('share_id');
 
-        $share_send_delete = new ShareSendDelete($own_id, $share_id);
-        $msg = $share_send_delete->getMessage();
+        $requested_user_id = $this->user->where('share_id', $share_id)->first();
+        $this->share_request->where('user_id', $own_id)->where('requested_user_id', $requested_user_id->id)->delete();
 
-        \Session::flash('flash_msg', $msg);
-        return redirect()->to('/share');
+        return redirect()->to('/share')->with('flash_msg', '申請を取り消しました。');
     }
 
     /**

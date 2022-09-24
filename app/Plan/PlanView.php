@@ -3,7 +3,6 @@
 namespace App\Plan;
 
 use Illuminate\Support\Facades\Crypt;
-use App\Share\ShareIdNameGet;
 use App\Models\Plan;
 use App\Models\User;
 use Auth;
@@ -54,8 +53,23 @@ class PlanView
 
             $share_user_id = $plan['share_user_id'];
             if($share_user_id) {
-                $share_id_name_get = new ShareIdNameGet($share_user_id);
-                $plan['share_users'] = $share_id_name_get->getData();
+                // 先頭と最後の「,」を除外
+                $len = strlen($share_user_id);
+                $share_users_text = substr($share_user_id, 1, $len-2);
+
+                // カンマ区切りになった文字列を配列に変更
+                $users_id = explode(',', $share_users_text);
+
+                $count = 0;
+                foreach($users_id as $user_id){
+                    $user = User::where('id', $user_id)->first();
+                    $share_users[$count]['name'] = $user['name'];
+                    $share_users[$count]['share_id'] = $user['share_id'];
+
+                    $count++;
+                }
+
+                $plan['share_users'] = $share_users;
             }
 
             $count++;

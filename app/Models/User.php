@@ -44,10 +44,27 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * 予定テーブルとリレーション
+     */
     public function plans()
     {
-        return $this->hasMany('App\Models\Plan');
-        return $this->hasMany('App\Models\EmailUpdate');
-        return $this->hasMany('App\Models\ShareRequest');
+        return $this->hasMany(Plan::class);
+    }
+
+    /**
+     * メールアドレス更新テーブルとリレーション
+     */
+    public function emailUpdates()
+    {
+        return $this->hasMany(EmailUpdate::class);
+    }
+
+    /**
+     * 予定共有申請テーブルとリレーション
+     */
+    public function shareRequest()
+    {
+        return $this->hasMany(ShareRequest::class);
     }
 }

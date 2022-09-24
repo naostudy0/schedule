@@ -6,7 +6,6 @@ use App\Models\User;
 
 class ShareUserList
 {
-    private $share_users;
     private $share_users_id;
 
     /**

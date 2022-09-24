@@ -102,6 +102,16 @@ class Plan extends Model
      */
     public function storePlan($request, $user_id)
     {
+        $share_user_id = null;
+        if ($request->input('share_user')) {
+            foreach ($request->only('share_user') as $share_id){
+                $share_ids[] = DB::table('users')
+                    ->where('share_id', $share_id)
+                    ->value('id');
+            }
+            $share_user_id = ',' . implode(',', $share_ids) . ',';
+        }
+
         DB::table($this->table)
             ->insert([
                 'user_id'       => $user_id,
@@ -112,7 +122,7 @@ class Plan extends Model
                 'content'       => Crypt::encrypt($request->content),
                 'detail'        => Crypt::encrypt($request->detail),
                 'color'         => $request->color,
-                'share_user_id' => $request->share_user_id,
+                'share_user_id' => $share_user_id,
                 'created_at'    => Carbon::now(),
                 'updated_at'    => Carbon::now(),
             ]);
@@ -128,9 +138,9 @@ class Plan extends Model
         $share_user_id = null;
         if ($request->input('share_user')) {
             foreach ($request->only('share_user') as $share_id){
-                $share_ids[] = DB::table('user')
+                $share_ids[] = DB::table('users')
                     ->where('share_id', $share_id)
-                    ->value('user_id');
+                    ->value('id');
             }
             $share_user_id = ',' . implode(',', $share_ids) . ',';
         }
