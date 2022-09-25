@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PlanRequest;
-use App\Plan\LayoutSet\LayoutSet;
 use Illuminate\Http\Request;
 use App\Models\Plan;
 use App\Models\User;
@@ -69,11 +68,8 @@ class PlanController extends Controller
             }
         }
 
-        $layout_set = new LayoutSet($plan_data);
-
         return view('plan.create_confirm', [
             'plan_data' => $plan_data,
-            'layout_set' => $layout_set,
             'share_user_name' => $share_user_name,
             ]);
     }
@@ -149,7 +145,6 @@ class PlanController extends Controller
     public function updateConfirm(PlanRequest $request)
     {
         $plan_data = $request->toArray();
-        $layout_set = new LayoutSet($plan_data);
 
         $share_user_name = null;
         if ($request->share_users == 1 && $request->share_user) {
@@ -160,7 +155,6 @@ class PlanController extends Controller
 
         return view('plan.update_confirm', [
             'plan_data' => $plan_data,
-            'layout_set' => $layout_set,
             'share_user_name' => $share_user_name,
             ]);
     }
@@ -213,7 +207,6 @@ class PlanController extends Controller
         }
 
         $plan_data = $this->plan->getOneRecord($plan_id);
-        $layout_set = new LayoutSet($plan_data);
 
         if ($plan_data['share_user_id']) {
             $plan_data['share_users'] = 1;
@@ -239,7 +232,6 @@ class PlanController extends Controller
 
         return view('plan.delete_confirm', [
             'plan_data' => $plan_data,
-            'layout_set' => $layout_set,
             'share_user_name' => $share_user_name,
             ]);
     }

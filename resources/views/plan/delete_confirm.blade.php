@@ -1,11 +1,5 @@
 @extends('layouts.confirm')
 
-
-@section('style')
-    @include('layouts.include.add_layout')
-@endsection
-
-
 @section('title', '削除内容確認')
 
 

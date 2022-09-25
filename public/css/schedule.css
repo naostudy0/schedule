@@ -632,14 +632,15 @@ li.nav-list a:hover {
     text-align: center;
     border-radius: 5px 0 0 5px;
     color: #333030;
+    line-height: 50px;
 }
 
 .plan-confirm .content-wrap .content {
     font-weight: bold;
-    display: table;
     float: right;
     width: 84%;
-    overflow-y: scroll;
+    line-height: 50px;
+    overflow-x: scroll;
     white-space: pre-wrap;
 }
 
