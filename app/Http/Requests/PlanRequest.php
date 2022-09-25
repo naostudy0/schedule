@@ -26,27 +26,14 @@ class PlanRequest extends FormRequest
         $form_data = $this->all();
 
         $start_date = strtotime($form_data["start_date"]);
-        $end_date = strtotime($form_data["end_date"]);
+        $end_date   = strtotime($form_data["end_date"]);
 
         // 終了日が開始日よりも後であれば開始時間と終了時間が前後しても良い
-        if ($start_date < $end_date) {
-            return [
-                'start_date' => 'required|date',
-                'start_time' => 'required|date_format:H:i',
-                'end_date'   => 'required|date|after_or_equal:start_date',
-                'end_time'   => 'required|date_format:H:i',
-                'color'      => 'required|integer|between:1,6',
-                'content'    => 'required|max:128',
-                'detail'     => 'max:255',
-            ];
-        }
-
-        // 終了日が開始日以前の場合は開始時刻と終了時刻が前後していないか確認
         return [
             'start_date' => 'required|date',
             'start_time' => 'required|date_format:H:i',
             'end_date'   => 'required|date|after_or_equal:start_date',
-            'end_time'   => 'required|date_format:H:i|after_or_equal:start_time',
+            'end_time'   => 'required|date_format:H:i' . ($start_date < $end_date ? '' : '|after_or_equal:start_time'),
             'color'      => 'required|integer|between:1,6',
             'content'    => 'required|max:128',
             'detail'     => 'max:255',

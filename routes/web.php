@@ -85,8 +85,9 @@ Route::group([
     'as' => 'share.',
     'middleware' => 'auth'
 ], function () {
-    Route::get('/', 'ShareController@show')->name('show');
-    Route::post('/', 'ShareController@changeShare')->name('change');
+    Route::get('/', 'ShareController@show')->name('index');
+    Route::post('/change-id', 'ShareController@changeId')->name('change_id');
+    Route::post('/change-permit', 'ShareController@changePermit')->name('change_permit');
     Route::post('/request', 'ShareController@shareSearch')->name('request');
     Route::post('/request/permit', 'ShareController@sharePermit')->name('request.permit');
     Route::post('/send', 'ShareController@shareSend')->name('send');

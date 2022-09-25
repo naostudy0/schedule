@@ -2,19 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Share\ShareRequested;
-use App\Share\ShareUserList;
-use App\Share\ShareSearch;
-use App\Share\ChangeStatus;
-use App\Share\SharePermit;
-use App\Share\ShareShow;
-use App\Share\ShareSend;
-use App\Share\ShareDelete;
-use App\Share\ShareSendDelete;
-use App\Models\ShareRequest;
-use App\Models\User;
 use Auth;
+use App\Models\ShareUser;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ShareController extends Controller
 {
@@ -23,15 +16,19 @@ class ShareController extends Controller
      */
     private $user;
     /**
-     * @var \App\Models\ShareRequest
+     * @var \App\Models\ShareUser
      */
-    private $share_request;
+    private $share_user;
 
+    /**
+     * コンストラクタ
+     */
     public function __construct()
     {
         $this->user = new User;
-        $this->share_request = new ShareRequest;
+        $this->share_user = new ShareUser;
     }
+
     /**
      * 予定共有管理画面の表示
      *
@@ -39,29 +36,18 @@ class ShareController extends Controller
      */
     public function show()
     {
-        // share_id（ユーザ検索用ID）と、ユーザ検索画面の表示可否を取得
-        $share_show = new ShareShow;
-        $share = $share_show->getData();
-
-        $id = Auth::id();
-
-        // 予定共有しているユーザのshare_id（ユーザ検索用ID）と名前を取得
-        $share_user_list = new ShareUserList($id);
-        $share_users_data = $share_user_list->getData();
-
+        $user_id = Auth::id();
+        // 予定共有しているユーザーを取得
+        $share_users_data = $this->share_user->getShareUserData($user_id);
         // 自分に届いている未回答の予定共有依頼を取得
-        $share_requested = new ShareRequested('requested_user_id');
-        $requested_user_data = $share_requested->getData();
+        $requested_user_data = $this->share_user->getShareRequestNotReplied($user_id, true);
         if ($requested_user_data) {
-            \Session::flash('request', '予定共有の申請が届いています。');
+            session()->flash('request', '予定共有の申請が届いています。');
         }
-
-        // 自分が申請して未回答の予定共有依頼を取得
-        $share_request = new ShareRequested('user_id');
-        $requesting_user_data = $share_request->getData();
+        // 自分が申請した未回答の予定共有依頼を取得
+        $requesting_user_data = $this->share_user->getShareRequestNotReplied($user_id, false);
 
         return view('share.show',[
-            'share' => $share,
             'share_users_data' => $share_users_data,
             'requesting_user_data' => $requesting_user_data,
             'requested_user_data' => $requested_user_data,
@@ -69,18 +55,60 @@ class ShareController extends Controller
     }
 
     /**
-     * ユーザ検索表示可否、またはshare_id（ユーザ検索用ID）変更
+     * 共有ユーザーIDの変更処理
      *
      * @param  \Illuminate\Http\Request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function changeShare(Request $request)
+    public function changeId(Request $request)
     {
-        // ステータスを変更し、画面表示するメッセージを取得（失敗時は失敗のメッセージ）
-        $change_status = new ChangeStatus($request);
-        $msg = $change_status->getMessage();
+        $share_id = '';
+        $result = false;
 
-        return redirect()->to('/share')->with('flash_msg', $msg);
+        if ($request->input('share_id') && ! $request->input('random')) {
+            $validator = Validator::make($request->all(),[
+                'share_id' => ['required', 'max:8', 'unique:users,share_id', 'regex:/^[a-zA-Z0-9]+$/'],
+            ]);
+            if (! $validator->fails()) {
+                $share_id = $request->input('share_id');
+            }
+        } elseif (! $request->input('share_id') && $request->input('random')) {
+            do {
+                $rand = md5(uniqid());
+                $share_id = substr($rand, 0, 8);
+            } while ($this->user->where('share_id', $share_id)->exists());
+        }
+
+        if ($share_id) {
+            $this->user->where('id', Auth::id())
+                ->update([
+                    'share_id' => $share_id
+                ]);
+            $result = true;
+        }
+        $msg = $result ? 'ユーザーIDを変更しました' : '8文字以内の英数字ではないか、他のユーザーに使用されているIDです';
+
+        return redirect()->route('share.index')->with('flash_msg', $msg);
+    }
+
+    /**
+     * ユーザ検索表示可否の変更処理
+     *
+     * @param  \Illuminate\Http\Request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function changePermit(Request $request)
+    {
+        $permit = (int)$request->input('share_permission');
+        if (! ($permit === 0 || $permit === 1)) {
+            return redirect()->back();
+        }
+
+        $user = Auth::user();
+        $user->share_permission = $permit;
+        $user->save();
+
+        return redirect()->route('share.index')->with('flash_msg', 'ステータスを更新しました');
     }
 
     /**
@@ -91,21 +119,36 @@ class ShareController extends Controller
      */
     public function shareSearch(Request $request)
     {
-        // ユーザ検索して結果を取得（誤ったIDが送信されたり、相手が表示拒否している場合はfalse）
-        $share_search = new ShareSearch($request);
-        $result = $share_search->getResult();
+        $share_id = $request->input('share_id');
+        // share_idが1~8文字の英数字かどうか
+        $validator = Validator::make([$share_id],[
+            'share_id' => ['between:1,8', 'regex:/^[a-zA-Z0-9]+$/'],
+        ]);
 
-        if (! $result) {
-            $msg = $share_search->getMessage();
-
-            \Session::flash('flash_msg', $msg);
-            return redirect()->to('/share');
+        $result = false;
+        if ($validator->fails()) {
+            $msg = '8文字以内の英数字を入力してください。';
+        } else {
+            if (! $this->user->where('share_id', $share_id)->exists()) {
+                $msg = '該当のユーザーが見つかりません。';
+            } else {
+                if ($share_id === Auth::user()->share_id){
+                    $msg = 'あなたのIDです。';
+                // 該当のユーザが予定共有を許可していない場合
+                } elseif (! $this->user->where('share_id', $share_id)->where('share_permission', 1)->exists()) {
+                    $msg = '該当のユーザーが見つかりません。';
+                } else {
+                    $result = true;
+                }
+            }
         }
 
-        $user_result = $share_search->getData();
+        if (! $result) {
+            return redirect()->route('share.index')->with('flash_msg', $msg);
+        }
 
         return view('share.request',[
-            'user_result' => $user_result,
+            'user_result' => $this->user->where('share_id', $share_id)->where('share_permission', 1)->first()
         ]);
     }
 
@@ -117,30 +160,66 @@ class ShareController extends Controller
      */
     public function sharePermit(Request $request)
     {
-        // ステータスを変更し、画面表示するメッセージを取得（失敗時は失敗のメッセージ）
-        $share_permit = new SharePermit($request);
-        $msg = $share_permit->getMessage();
+        $permit = $request->input('permit');
+        if (! ($permit == 0 || $permit == 1)) {
+            return redirect()->back();
+        }
 
-        \Session::flash('flash_msg', $msg);
-        return redirect()->to('/share');
+        $share_id = $request->input('share_id');
+        $result = $this->share_user->updateShareUser(Auth::id(), $share_id, $permit);
+
+        $msg = $result ? '予定共有を承認しました' : '予定共有を拒否しました';
+        return redirect()->route('share.index')->with('flash_msg', $msg);
     }
 
     /**
-     * 共有申請する
+     * 共有申請
      *
      * @param  \Illuminate\Http\Request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function shareSend(Request $request)
     {
-        $share_id = $request->input('share_id');
+        $target_id = $this->user->where('share_id', $request->input('share_id'))->where('share_permission', 1)->value('id');
+        if (! $target_id) {
+            return redirect()->route('share.index')->with('flash_msg', '対象のユーザーが見つかりません');
+        }
 
-        // ステータスを変更し、画面表示するメッセージを取得（失敗時は失敗のメッセージ）
-        $share_send = new ShareSend($share_id);
-        $msg = $share_send->getMessage();
+        $user_id = Auth::id();
+        if ($target_id === $user_id) {
+            return redirect()->route('share.index')->with('flash_msg', 'あなたのIDです');
+        }
 
-        \Session::flash('flash_msg', $msg);
-        return redirect()->to('/share');
+        $is_requested = $this->share_user->where('requested_user_id', $user_id)
+                            ->where('received_user_id', $target_id)
+                            ->where('is_replied', 0)
+                            ->exists();
+        if ($is_requested) {
+            return redirect()->route('share.index')->with('flash_msg', '既に申請済みです');
+        }
+
+        $share_user_id = $this->share_user->where('received_user_id', $user_id)
+                            ->where('requested_user_id', $target_id)
+                            ->where('is_replied', 0)
+                            ->value('share_user_id');
+        if ($share_user_id) {
+            $this->share_user->where('share_user_id', $share_user_id)
+                ->update([
+                    'is_replied' => 1,
+                    'is_shared'  => 1,
+                    'updated_at' => Carbon::now(),
+                ]);
+            return redirect()->route('share.index')->with('flash_msg', '予定共有を許可しました');
+        }
+
+        $this->share_user->create([
+            'requested_user_id' => $user_id,
+            'received_user_id'  => $target_id,
+            'is_replied' => 0,
+            'is_shared'  => 0,
+        ]);
+
+        return redirect()->route('share.index')->with('flash_msg', '予定共有申請が完了しました');
     }
 
     /**
@@ -151,13 +230,14 @@ class ShareController extends Controller
      */
     public function shareSendDelete(Request $request)
     {
-        $own_id = Auth::id();
         $share_id = $request->input('share_id');
 
-        $requested_user_id = $this->user->where('share_id', $share_id)->first();
-        $this->share_request->where('user_id', $own_id)->where('requested_user_id', $requested_user_id->id)->delete();
+        $received_user_id = $this->user->where('share_id', $share_id)->value('id');
+        $this->share_user->where('requested_user_id', Auth::id())
+            ->where('received_user_id', $received_user_id)
+            ->delete();
 
-        return redirect()->to('/share')->with('flash_msg', '申請を取り消しました。');
+        return redirect()->route('share.index')->with('flash_msg', '申請を取り消しました。');
     }
 
     /**
@@ -169,11 +249,8 @@ class ShareController extends Controller
     public function shareDelete(Request $request)
     {
         $share_id = $request->input('share_id');
+        $this->share_user->releaseShareUser(Auth::id(), $share_id);
 
-        $share_delete = new ShareDelete($share_id);
-        $msg = $share_delete->getMessage();
-
-        \Session::flash('flash_msg', $msg);
-        return redirect()->to('/share');
+        return redirect()->route('share.index')->with('flash_msg', '予定共有を解除しました');
     }
 }

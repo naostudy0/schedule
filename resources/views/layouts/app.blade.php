@@ -55,8 +55,8 @@
                             @endif
                         @else
                             <li class="nav-list">
-                                <a href="{{ route('share.show') }}" class="nav-menu"
-                                href="{{ route('share.show') }}";>
+                                <a href="{{ route('share.index') }}" class="nav-menu"
+                                href="{{ route('share.index') }}";>
                                 予定共有管理</a>
                             </li>
                             <li class="nav-item dropdown nav-list">
