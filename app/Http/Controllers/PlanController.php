@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\PlanRequest;
-use Illuminate\Http\Request;
-use App\Models\Plan;
-use App\Models\User;
 use Auth;
+use App\Http\Requests\PlanRequest;
+use App\Models\Plan;
+use App\Models\ShareUser;
+use App\Models\User;
+use Illuminate\Http\Request;
 
 class PlanController extends Controller
 {
@@ -19,6 +20,10 @@ class PlanController extends Controller
      */
     private $user;
     /**
+     * @var \App\Models\ShareUser
+     */
+    private $share_user;
+    /**
      * @var string
      */
     private $not_exist = '該当の予定が見つかりませんでした。';
@@ -30,6 +35,7 @@ class PlanController extends Controller
     {
         $this->plan = new Plan;
         $this->user = new User;
+        $this->share_user = new ShareUser;
     }
 
     /**
@@ -44,6 +50,7 @@ class PlanController extends Controller
         $plan_data = $this->initialize($request);
         // 色選択の初期値
         $color_checked = $this->getColor();
+        $plan_data['share_users'] = $this->share_user->getShareUserData(Auth::id());
 
         return view('plan.create', [
             'plan_data' => $plan_data,
@@ -84,7 +91,7 @@ class PlanController extends Controller
     {
         $plan_data = $request->toArray();
         $plan_data['cancel_date'] = substr($plan_data['start_date'], 0, 7);
-        $plan_data['share_users'] = $this->getShareUserData();
+        $plan_data['share_users'] = $this->share_user->getShareUserData(Auth::id());
 
         $color_checked = $this->getColor($request->input('color'));
 
@@ -126,7 +133,7 @@ class PlanController extends Controller
 
         $plan_data = $this->plan->getOneRecord($plan_id);
 
-        $plan_data['share_users'] = $this->getShareUserData();
+        $plan_data['share_users'] = $this->share_user->getShareUserData(Auth::id());
 
         $color_checked = $this->getColor($plan_data['color']);
 
@@ -169,7 +176,7 @@ class PlanController extends Controller
     {
         $plan_data = $request->toArray();
         $plan_data['cancel_date'] = substr($plan_data['start_date'], 0, 7);
-        $plan_data['share_users'] = $this->getShareUserData();
+        $plan_data['share_users'] = $this->share_user->getShareUserData(Auth::id());
         $color_checked = $this->getColor($request->input('color'));
 
         return view('plan.update',[
@@ -255,7 +262,7 @@ class PlanController extends Controller
         // リダイレクト先の取得
         $redirect_route = $this->getRedirectRoute($row['start_date']);
 
-        $this->plan->where('id', $plan_id)->delete();
+        $this->plan->where('plan_id', $plan_id)->delete();
 
         return redirect($redirect_route)->with('flash_msg', '予定を削除しました');;
     }
@@ -310,7 +317,7 @@ class PlanController extends Controller
             }
         }
 
-        $initialize['share_users'] = $this->getShareUserData();
+        $initialize['share_users'] = $this->share_user->getShareUserData(Auth::id());
 
         return $initialize;
     }
@@ -324,37 +331,5 @@ class PlanController extends Controller
     private function getRedirectRoute($start_date)
     {
         return '/schedule?date=' . substr($start_date, 0, 7);
-    }
-
-    /**
-     * 予定を共有しているユーザーの情報を取得
-     * 
-     * @return null|array
-     * 
-     * @todo DB構造変更後に要修正
-     */
-    private function getShareUserData()
-    {
-        $user = Auth::user();
-        $share_user_id = $user->share_user_id;
-        if (! $share_user_id) {
-            return;
-        }
-
-        // 先頭と最後の「,」を除外
-        $len = strlen($share_user_id);
-        $share_users_text = substr($share_user_id, 1, $len - 2);
-        // カンマ区切りになった文字列を配列に変更
-        $users_id = explode(',', $share_users_text);
-
-        foreach ($users_id as $user_id) {
-            $user = $this->user->where('id', $user_id)->first();
-            $share_users[] = [
-                'name'     => $user->name,
-                'share_id' => $user->share_id,
-            ];
-        }
-
-        return $share_users;
     }
 }

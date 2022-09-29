@@ -98,7 +98,11 @@
 
                         <div id="share-checkbox" class="hide share-checkbox">
                             @foreach ($plan_data['share_users'] as $share_user)
-                            <span class="input-wrap"><label><input type="checkbox" name="share_user[]" value="{{$share_user['share_id']}}">{{$share_user['name']}}</label></span>
+                                <span class="input-wrap">
+                                    <label>
+                                        <input type="checkbox" name="share_user[]" value="{{ $share_user->share_id }}">{{ $share_user->name }}
+                                    </label>
+                                </span>
                             @endforeach
                         </div><!-- share-checkbox -->
                     </div><!-- share-users -->
