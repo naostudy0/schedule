@@ -24,10 +24,8 @@ class CustomerController extends Controller
     public function registedNameStore(Request $request)
     {
         $name = $request->validate(['name' => 'required|string']);
-
-        $id = Auth::id();
         
-        $user = User::where('id', $id)->first();
+        $user = User::where('user_id', Auth::id())->first();
         $user->name = $name['name'];
         $user->save();
 
@@ -72,9 +70,7 @@ class CustomerController extends Controller
     public function registedPasswordStore(Request $request)
     {
         $this->passwordValidator($request->all())->validate();
-        $id = Auth::id();
-
-        $user = User::where('id', $id)->first();
+        $user = User::where('user_id', Auth::id())->first();
 
         if (! Hash::check($request->password_now, $user->password)) {
             $validator = Validator::make([], []);
@@ -139,7 +135,7 @@ class CustomerController extends Controller
         }
 
         // 上記に該当しなかった場合にメールアドレスを変更する
-        $user = User::where('id', $email_new->user_id)->first();
+        $user = User::where('user_id', $email_new->user_id)->first();
         $user->email = $email_new->email;
         $user->save();
 
@@ -165,7 +161,7 @@ class CustomerController extends Controller
         $plan = Plan::where('user_id', $user_id)->delete();
         
         // statusを退会済み「9」に変更
-        $user = User::where('id', $user_id)->first();
+        $user = User::where('user_id', $user_id)->first();
         $user->status = '9';
         $user->save();
 

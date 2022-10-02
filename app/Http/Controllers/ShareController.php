@@ -80,7 +80,7 @@ class ShareController extends Controller
         }
 
         if ($share_id) {
-            $this->user->where('id', Auth::id())
+            $this->user->where('user_id', Auth::id())
                 ->update([
                     'share_id' => $share_id
                 ]);
@@ -180,7 +180,7 @@ class ShareController extends Controller
      */
     public function shareSend(Request $request)
     {
-        $target_id = $this->user->where('share_id', $request->input('share_id'))->where('share_permission', 1)->value('id');
+        $target_id = $this->user->where('share_id', $request->input('share_id'))->where('share_permission', 1)->value('user_id');
         if (! $target_id) {
             return redirect()->route('share.index')->with('flash_msg', '対象のユーザーが見つかりません');
         }
@@ -232,7 +232,7 @@ class ShareController extends Controller
     {
         $share_id = $request->input('share_id');
 
-        $received_user_id = $this->user->where('share_id', $share_id)->value('id');
+        $received_user_id = $this->user->where('share_id', $share_id)->value('user_id');
         $this->share_user->where('requested_user_id', Auth::id())
             ->where('received_user_id', $received_user_id)
             ->delete();

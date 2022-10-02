@@ -81,7 +81,7 @@ class Plan extends Model
             foreach ($request->only('share_user') as $share_id){
                 $shared_user_ids[] = DB::table('users')
                     ->where('share_id', $share_id)
-                    ->value('id');
+                    ->value('user_id');
             }
         }
 
@@ -126,7 +126,7 @@ class Plan extends Model
             foreach ($request->only('share_user') as $share_id){
                 $shared_user_ids[] = DB::table('users')
                     ->where('share_id', $share_id)
-                    ->value('id');
+                    ->value('user_id');
             }
         }
 
@@ -184,7 +184,7 @@ class Plan extends Model
                 DB::raw("GROUP_CONCAT(plan_share.plan_shared_user_id) AS shared_user_ids"),
             ])
             ->leftjoin('plan_share', "$this->table.plan_id", '=', 'plan_share.plan_id')
-            ->leftjoin('users as made_users', 'plan_share.plan_made_user_id', '=', 'made_users.id')
+            ->leftjoin('users as made_users', 'plan_share.plan_made_user_id', '=', 'made_users.user_id')
             ->whereBetween('start_datetime', [$start_date, $end_date])
             ->where(function ($query) use ($user_id) {
                 $query->where("$this->table.user_id", $user_id)

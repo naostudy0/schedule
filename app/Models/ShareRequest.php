@@ -9,6 +9,10 @@ class ShareRequest extends Model
     /**
      * @var string
      */
+    protected $primaryKey = 'share_request_id';
+    /**
+     * @var string
+     */
     protected $table = 'share_requests';
 
     /**

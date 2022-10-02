@@ -71,7 +71,7 @@ class ScheduleController extends Controller
             }
             foreach ($shared_user_ids as $shared_user_id) {
                 // 予定共有されているユーザー名を取得（GROUP CONCATで取得すると区切り文字を含む名前の場合に不具合が起きるため）
-                $shared_user_names[$plan->plan_id][$shared_user_id] = $this->user->where('id', $shared_user_id)->value('name');
+                $shared_user_names[$plan->plan_id][$shared_user_id] = $this->user->where('user_id', $shared_user_id)->value('name');
             }
         }
 

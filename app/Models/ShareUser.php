@@ -62,7 +62,7 @@ class ShareUser extends Model
                     'name',
                     'share_id',
                 ])
-                ->where('id', $target_id)
+                ->where('user_id', $target_id)
                 ->first();
         }
         return $share_user_data;
@@ -96,7 +96,7 @@ class ShareUser extends Model
                     'name',
                     'share_id',
                 ])
-                ->where('id', $target_id)
+                ->where('user_id', $target_id)
                 ->first();
         }
         return $share_user_data;
