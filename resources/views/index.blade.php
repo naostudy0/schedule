@@ -12,6 +12,7 @@
         <!-- Styles -->
         <link href="{{ asset('css/reset.css') }}" rel="stylesheet">
         <link href="{{ asset('css/welcome.css') }}" rel="stylesheet">
+        <script src="{{ asset('js/app.js')}}"></script>
     </head>
     <body>
         <div class="main">
@@ -95,6 +96,7 @@
                 </section><!-- sec3 -->
             </div><!-- content -->
         </div><!-- main -->
+
         <footer>
             <small>&copy 2021 予定管理n.u</small>
         </footer>
