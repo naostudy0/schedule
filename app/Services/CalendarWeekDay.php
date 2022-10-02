@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Calendar;
+namespace App\Services;
 
 use Carbon\Carbon;
 use Yasumi\Yasumi;

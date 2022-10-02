@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Calendar;
+namespace App\Services;
 
 /**
  * 前月と翌月の日付をカレンダーに表示させないようにするためのクラス

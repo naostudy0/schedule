@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Calendar\CalendarView;
+use App\Services\CalendarService;
 use App\Models\Plan;
 use App\Models\PlanShare;
 use App\Models\User;
@@ -51,7 +51,7 @@ class ScheduleController extends Controller
             $date = time();
         }
 
-        $calendar = new CalendarView($date);
+        $calendar = new CalendarService($date);
 
         // 自分の予定と共有された予定を取得
         $plans = $this->plan->getMyPlansAndSharedPlans(new Carbon($date), Auth::id());

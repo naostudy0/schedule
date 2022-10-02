@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Calendar;
+namespace App\Services;
 
 use Carbon\Carbon;
 
-class CalendarView
+class CalendarService
 {
     /**
      * @var \Carbon\Carbon
