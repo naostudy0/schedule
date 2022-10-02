@@ -25,7 +25,6 @@ class ScheduleController extends Controller
      */
     private $user;
 
-
     /**
      * コンストラクタ
      */
@@ -58,7 +57,7 @@ class ScheduleController extends Controller
         $plans = $this->plan->getMyPlansAndSharedPlans(new Carbon($date), Auth::id());
 
         $days_have_plan = [];
-        $shared_user_name = [];
+        $shared_user_names = [];
         foreach ($plans as $plan) {
             $start_date = Carbon::parse($plan->start_datetime)->isoFormat('YYYY/MM/DD(ddd)');
             if (! in_array($start_date, $days_have_plan)) {

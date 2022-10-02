@@ -17,28 +17,26 @@
                                 <div class="col-lg-12">
                                     <ul class="confirm-list">
                                         <li class="datetime">
-                                            <time class="date">{{ $plan_data['start_date'] }}</time>
-                                            <time class="time">{{ $plan_data['start_time'] }}</time>
+                                            <time class="date">{{ is_array($plan_data) ? $plan_data['start_date'] . ' ' . $plan_data['start_time'] : $plan_data->start_datetime }}</time>
                                             <span> 〜 </span>
-                                            <time class="date">{{ $plan_data['end_date'] }}</time>
-                                            <time class="time">{{ $plan_data['end_time'] }}</time>
+                                            <time class="date">{{ is_array($plan_data) ? $plan_data['end_date'] . ' ' . $plan_data['end_time'] : $plan_data->end_datetime }}</time>
                                         </li>
 
                                         <li class="content-wrap">
                                             <span class="tag">内容</span>
-                                            <span class="content"><span class="table">{{ $plan_data['content'] }}</span></span>
+                                            <span class="content"><span class="table">{{ is_array($plan_data) ? $plan_data['content'] : $plan_data->content }}</span></span>
                                         </li>
 
                                         <li class="detail-wrap">
                                             <span class="tag">詳細</span>
-                                            <span class="detail"><span class="table">{{ $plan_data['detail'] }}</span></span>
+                                            <span class="detail"><span class="table">{{ is_array($plan_data) ? $plan_data['detail'] : $plan_data->detail }}</span></span>
                                         </li>
 
-                                        @if ($share_user_name)
+                                        @if ($shared_user_names)
                                             <div class="share-users">
                                                 <p>■共有するユーザー</p>
                                                 <ul>
-                                                    @foreach ($share_user_name as $name)
+                                                    @foreach ($shared_user_names as $name)
                                                         <li>{{ $name }}</li>
                                                     @endforeach
                                                 </ul>

@@ -62,18 +62,18 @@ Route::group([
     'middleware' => 'auth'
 ], function () {
     // 会員情報一覧
-    Route::get('/', 'CustomerController@index')->name('index');
+    Route::view('/', 'customer.index')->name('index');
     // 名前変更
-    Route::get('registed_name_update', 'CustomerController@registedNameUpdate')->name('name.update');
+    Route::view('registed_name_update', 'customer.name_update')->name('name.update');
     Route::post('registed_name_store', 'CustomerController@registedNameStore')->name('name.store');
     // パスワード変更
-    Route::get('registed_password_update', 'CustomerController@registedPasswordUpdate')->name('password.update');
+    Route::view('registed_password_update', 'customer.password_update')->name('password.update');
     Route::post('registed_password_store', 'CustomerController@registedPasswordStore')->name('password.store');
     // メールアドレス変更
-    Route::get('registed_email_update', 'CustomerController@registedEmailUpdate')->name('email.update');
+    Route::view('registed_email_update', 'customer.email_update_check')->name('email.update');
     Route::post('registed_email_confirm', 'CustomerController@registedEmailConfirm')->name('email.confirm');
     // 退会
-    Route::get('delete_check', 'CustomerController@accountDeleteConfirm')->name('delete.confirm');
+    Route::view('delete_check', 'customer.delete.account_delete_confirm')->name('delete.confirm');
     Route::get('delete_store', 'CustomerController@accountDeleteStore')->name('delete.store');
 });
 

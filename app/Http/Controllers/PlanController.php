@@ -8,6 +8,8 @@ use App\Models\Plan;
 use App\Models\ShareUser;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class PlanController extends Controller
 {
@@ -46,14 +48,27 @@ class PlanController extends Controller
      */
     public function planCreate(Request $request)
     {
-        // パラメーター初期値
-        $plan_data = $this->initialize($request);
+        $date = $request->input('date');
+        $validator = Validator::make($request->only('date'), [
+            'date' => 'required|date_format:Y-m-d'
+        ]);
+        if ($validator->fails()) {
+            $date = Carbon::today()->format('Y-m-d');
+        }
+        $datetime = $date . ' 00:00';
+
         // 色選択の初期値
         $color_checked = $this->getColor();
-        $plan_data['share_users'] = $this->share_user->getShareUserData(Auth::id());
+        $share_users = $this->share_user->getShareUserData(Auth::id());
 
         return view('plan.create', [
-            'plan_data' => $plan_data,
+            'plan_data' => [
+                'start_datetime' => $datetime,
+                'end_datetime'   => $datetime,
+                'detail' => '',
+                'content' => '',
+            ],
+            'share_users' => $share_users,
             'color_checked' => $color_checked,
         ]);
     }
@@ -68,17 +83,17 @@ class PlanController extends Controller
     {
         $plan_data = $request->all();
 
-        $share_user_name = null;
+        $shared_user_names = [];
         if ($request->share_users == 1 && $request->share_user) {
             foreach ($plan_data['share_user'] as $share_id) {
-                $share_user_name[] = $this->user->where('share_id', $share_id)->value('name');
+                $shared_user_names[] = $this->user->where('share_id', $share_id)->value('name');
             }
         }
 
         return view('plan.create_confirm', [
             'plan_data' => $plan_data,
-            'share_user_name' => $share_user_name,
-            ]);
+            'shared_user_names' => $shared_user_names,
+        ]);
     }
 
     /**
@@ -90,14 +105,18 @@ class PlanController extends Controller
     public function planReCreate(Request $request)
     {
         $plan_data = $request->toArray();
+        $plan_data['start_datetime'] = $plan_data['start_date'] . ' ' . $plan_data['start_time'];
+        $plan_data['end_datetime'] = $plan_data['end_date'] . ' ' . $plan_data['end_time'];
+
         $plan_data['cancel_date'] = substr($plan_data['start_date'], 0, 7);
-        $plan_data['share_users'] = $this->share_user->getShareUserData(Auth::id());
+        $share_users = $this->share_user->getShareUserData(Auth::id());
 
         $color_checked = $this->getColor($request->input('color'));
 
         return view('plan.create',[
             'plan_data' => $plan_data,
             'color_checked' => $color_checked,
+            'share_users' => $share_users,
         ]);
     }
 
@@ -125,22 +144,22 @@ class PlanController extends Controller
      */
     public function planUpdate(Request $request)
     {
-        // 予定が存在していれば予定IDを取得
-        $plan_id = $this->plan->getIdIfExists($request->input('id'), Auth::id());
-        if (! $plan_id) {
+        $plan_id = $request->input('id');
+        $exists = $this->plan->where('plan_id', $plan_id)->where('user_id', Auth::id())->exists();
+        if (! $exists) {
             return redirect()->route('schedule')->with('flash_msg', $this->not_exist);
         }
 
         $plan_data = $this->plan->getOneRecord($plan_id);
 
-        $plan_data['share_users'] = $this->share_user->getShareUserData(Auth::id());
+        $plan_data->share_users = $this->share_user->getShareUserData(Auth::id());
 
-        $color_checked = $this->getColor($plan_data['color']);
+        $color_checked = $this->getColor($plan_data->color);
 
         return view('plan.update', [
             'plan_data' => $plan_data,
             'color_checked' => $color_checked,
-            ]);
+        ]);
     }
 
     /**
@@ -153,17 +172,17 @@ class PlanController extends Controller
     {
         $plan_data = $request->toArray();
 
-        $share_user_name = null;
+        $shared_user_names = [];
         if ($request->share_users == 1 && $request->share_user) {
             foreach ($plan_data['share_user'] as $share_id) {
-                $share_user_name[] = $this->user->where('share_id', $share_id)->value('name');
+                $shared_user_names[] = $this->user->where('share_id', $share_id)->value('name');
             }
         }
 
         return view('plan.update_confirm', [
             'plan_data' => $plan_data,
-            'share_user_name' => $share_user_name,
-            ]);
+            'shared_user_names' => $shared_user_names,
+        ]);
     }
 
     /**
@@ -175,13 +194,18 @@ class PlanController extends Controller
     public function planReUpdate(Request $request)
     {
         $plan_data = $request->toArray();
+        $plan_data['start_datetime'] = $plan_data['start_date'] . ' ' . $plan_data['start_time'];
+        $plan_data['end_datetime'] = $plan_data['end_date'] . ' ' . $plan_data['end_time'];
+
         $plan_data['cancel_date'] = substr($plan_data['start_date'], 0, 7);
-        $plan_data['share_users'] = $this->share_user->getShareUserData(Auth::id());
+
+        $share_users = $this->share_user->getShareUserData(Auth::id());
         $color_checked = $this->getColor($request->input('color'));
 
         return view('plan.update',[
             'plan_data' => $plan_data,
             'color_checked' => $color_checked,
+            'share_users' => $share_users,
         ]);
     }
 
@@ -193,7 +217,12 @@ class PlanController extends Controller
      */
     public function updateStore(PlanRequest $request)
     {
-        $this->plan->updatePlan($request);
+        $exists = $this->plan->where('plan_id', $request->id)->where('user_id', Auth::id())->exists();
+        if (! $exists) {
+            return redirect()->back()->with('flash_msg', '該当の予定が見つかりません');
+        }
+
+        $this->plan->updatePlan($request, Auth::id());
         $redirect_route = $this->getRedirectRoute($request->input('start_date'));
 
         return redirect($redirect_route)->with('flash_msg', '予定を更新しました');
@@ -207,40 +236,27 @@ class PlanController extends Controller
      */
     public function deleteConfirm(Request $request)
     {
-        // 予定が存在していれば予定IDを取得
-        $plan_id = $this->plan->getIdIfExists($request->input('id'), Auth::id());
-        if (! $plan_id) {
+        $plan_id = $request->input('id');
+        $exists = $this->plan->where('plan_id', $plan_id)->where('user_id', Auth::id())->exists();
+        if (! $exists) {
             return redirect()->route('schedule')->with('flash_msg', $this->not_exist);
         }
 
         $plan_data = $this->plan->getOneRecord($plan_id);
 
-        if ($plan_data['share_user_id']) {
-            $plan_data['share_users'] = 1;
-            $share_user_id = $plan_data['share_user_id'];
-
-            $len = strlen($share_user_id);
-            $share_users_text = substr($share_user_id, 1, $len-2);
-
-            // カンマ区切りになった文字列を配列に変更
-            $users_id = explode(',', $share_users_text);
-
-            // 名前のみ
-            foreach($users_id as $user_id){
-                $user = User::where('id', $user_id)->first();
-                $names['name'] = $user['name'];
+        $shared_user_names = [];
+        $shared_user_ids = $plan_data->shared_user_ids ? explode(',', $plan_data->shared_user_ids) : false;
+        if ($shared_user_ids) {
+            foreach ($shared_user_ids as $shared_user_id) {
+                // 予定共有されているユーザー名を取得（GROUP CONCATで取得すると区切り文字を含む名前の場合に不具合が起きるため）
+                $shared_user_names[$shared_user_id] = $this->user->where('id', $shared_user_id)->value('name');
             }
-
-            $share_user_name = $names;
-        } else {
-            $plan_data['share_users'] = 0;
-            $share_user_name = null;
         }
 
         return view('plan.delete_confirm', [
             'plan_data' => $plan_data,
-            'share_user_name' => $share_user_name,
-            ]);
+            'shared_user_names' => $shared_user_names,
+        ]);
     }
 
     /**
@@ -251,16 +267,16 @@ class PlanController extends Controller
      */
     public function deleteStore(Request $request)
     {
-        // 予定が存在していれば予定IDを取得
-        $plan_id = $this->plan->getIdIfExists($request->input('id'), Auth::id());
-        if (! $plan_id) {
+        $plan_id = $request->input('id');
+        $exists = $this->plan->where('plan_id', $plan_id)->where('user_id', Auth::id())->exists();
+        if (! $exists) {
             return redirect()->route('schedule')->with('flash_msg', $this->not_exist);
         }
 
         // リダイレクト先の取得のために削除前にレコードを取得
         $row = $this->plan->getOneRecord($plan_id);
         // リダイレクト先の取得
-        $redirect_route = $this->getRedirectRoute($row['start_date']);
+        $redirect_route = $this->getRedirectRoute($row->start_datetime);
 
         $this->plan->where('plan_id', $plan_id)->delete();
 
@@ -280,46 +296,6 @@ class PlanController extends Controller
         }
 
         return $color_checked;
-    }
-
-    /**
-     * 予定作成画面のパラメータ初期値
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return array
-     */
-    private function initialize($request)
-    {
-        $initialize = [
-            'start_date'  => '',
-            'start_time'  => '00:00',
-            'end_date'    => '',
-            'end_time'    => '00:00',
-            'content'     => '',
-            'detail'      => '',
-            'cancel_date' => '',
-        ];
-
-        // クエリパラメータのチェック
-        $date = $request->input('date');
-
-        // 存在している日付か確認するために分割
-        if ($date) {
-            list($year, $month, $day) = explode('-', $date);
-            // 予定入力前に表示していた月に戻れるように「キャンセル」用のdate作成
-            $cancel_check = $year . '-' . $month;
-
-            // 年月のデータが正しければ変数を更新
-            if ($date && preg_match("/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/", $date) && checkdate($month, $day, $year)) {
-                $initialize['start_date']  = $date;
-                $initialize['end_date']    = $date;
-                $initialize['cancel_date'] = $cancel_check;
-            }
-        }
-
-        $initialize['share_users'] = $this->share_user->getShareUserData(Auth::id());
-
-        return $initialize;
     }
 
     /**

@@ -16,26 +16,6 @@ use Illuminate\Support\Facades\Mail;
 class CustomerController extends Controller
 {
     /**
-     * 会員情報一覧
-     * 
-     * @return \Illuminate\View\View
-     */
-    public function index()
-    {
-        return view('customer.index');
-    }
-
-    /**
-     * 名前変更ページ
-     * 
-     * @return \Illuminate\View\View
-     */
-    public function registedNameUpdate()
-    {
-        return view('customer.name_update');
-    }
-
-    /**
      * 名前変更処理
      * 
      * @param  \Illuminate\Http\Request
@@ -53,16 +33,6 @@ class CustomerController extends Controller
 
         \Session::flash('flash_msg', '登録情報を更新しました。');
         return redirect()->route('customer.index');
-    }
-
-    /**
-     * パスワード変更ページ
-     * 
-     * @return \Illuminate\View\View
-     */
-    public function registedPasswordUpdate()
-    {
-        return view('customer.password_update');
     }
 
     /**
@@ -118,16 +88,6 @@ class CustomerController extends Controller
             \Session::flash('flash_msg', '登録情報を更新しました。');
             return redirect()->route('customer.index');
         }
-    }
-
-    /**
-     * メールアドレス変更ページ
-     * 
-     * @return \Illuminate\View\View
-     */
-    public function registedEmailUpdate()
-    {
-        return view('customer.email_update_check');
     }
 
     /**
@@ -187,16 +147,6 @@ class CustomerController extends Controller
         return view('customer.email_update_result', [
             'result' => $result
         ]);
-    }
-
-    /**
-     * 退会ページ
-     * 
-     * @return \Illuminate\View\View
-     */
-    public function accountDeleteConfirm()
-    {
-        return view('customer.delete.account_delete_confirm');
     }
 
     /**
