@@ -94,3 +94,7 @@ Route::group([
     Route::post('/send/delete', 'ShareController@shareSendDelete')->name('send.delete');
     Route::post('/delete', 'ShareController@shareDelete')->name('delete');
 });
+
+Route::get('/schedule-new/{any?}', function () {
+    return view('schedule-new.index');
+})->where('any', '.*');
