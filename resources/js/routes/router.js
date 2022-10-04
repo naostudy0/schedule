@@ -1,24 +1,24 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
+import Vue from 'vue';
+import VueRouter from 'vue-router';
 
 Vue.use(VueRouter);
 
-import Login from "../components/Login.vue";
-import About from "../components/About.vue";
+import Index from '../components/index.vue';
+import Setting from '../components/Setting.vue';
 
 const router = new VueRouter({
-  mode: "history",
+  mode: 'history',
   base: '/schedule-new/',
   routes: [
     {
-      path: "",
-      name: "Login",
-      component: Login,
+      path: '/',
+      name: 'Index',
+      component: Index,
     },
     {
-      path: "/about",
-      name: "About",
-      component: About,
+      path: '/setting',
+      name: 'Setting',
+      component: Setting,
     }
   ]
 });

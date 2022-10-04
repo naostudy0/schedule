@@ -1,5 +1,5 @@
 <template>
   <div>
-    Login
+    予定一覧
   </div>
 </template>
