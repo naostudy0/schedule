@@ -97,4 +97,4 @@ Route::group([
 
 Route::get('/schedule-new/{any?}', function () {
     return view('schedule-new.index');
-})->where('any', '.*');
+})->where('any', '.*')->middleware('auth');;
