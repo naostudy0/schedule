@@ -43,5 +43,5 @@ onclick="clickEvent();">更新</button>
 
 
 @section('btn_footer')
-<a href="{{ route('customer.show') }}" class="logout btn btn-secondary">戻る</a>
+<a href="{{ route('customer.index') }}" class="logout btn btn-secondary">戻る</a>
 @endsection

@@ -16,17 +16,20 @@
                     <div class="start-end flex-center-wrapper">
                         <label for="start_date" class="datetime">開始</label>
                         <input type="date" name="start_date" id="start_date" class="date" 
-                            value="{{ old('start_date', $plan_data['start_date']) }}"><!-- 
+                            value="{{ old('start_date', is_array($plan_data) ? substr($plan_data['start_datetime'], 0, 10) : substr($plan_data->start_datetime, 0, 10)) }}"><!-- 
                     ---><input type="time" name="start_time" id="start_time" class="time" 
-                            value="{{ old('start_time', substr($plan_data['start_time'], 0, 5)) }}"><br>
+                            value="{{ old('start_time', is_array($plan_data) ?
+                                substr($plan_data['start_datetime'], 11, 5) : substr($plan_data->start_datetime, 11, 5)) }}"><br>
                     </div><!-- start-end flex-center-wrapper -->
 
                     <div class="start-end flex-center-wrapper">
                         <label for="end_date" class="datetime">終了</label>
                         <input type="date" name="end_date" id="end_date" class="date"
-                            value="{{ old('end_date', $plan_data['end_date']) }}"><!-- 
+                            value="{{ old('end_date', is_array($plan_data) ?
+                                substr($plan_data['end_datetime'], 0, 10) : substr($plan_data->end_datetime, 0, 10)) }}"><!-- 
                     ---><input type="time" name="end_time" id="end_time" class="time"
-                            value="{{ old('end_time', substr($plan_data['end_time'], 0, 5)) }}"><br>
+                            value="{{ old('end_time', is_array($plan_data) ?
+                                substr($plan_data['end_datetime'], 11, 5) : substr($plan_data->end_datetime, 11, 5)) }}"><br>
                     </div><!-- start-end flex-center-wrapper -->
 
                 </div><!-- plan-datetime -->
@@ -66,7 +69,7 @@
 
                 <div class="content">
                     <label for="content">内容</label><br>
-                    <input type="text" class="" name="content" id="content" value="{{ old('content', $plan_data['content']) }}"><br>
+                    <input type="text" class="" name="content" id="content" value="{{ old('content', is_array($plan_data) ? $plan_data['content'] : $plan_data->content) }}"><br>
 
                     @if ($errors->has('content'))
                     <p class="text-danger">{{ $errors->first('content') }}</p>
@@ -75,14 +78,15 @@
 
                 <div class="detail">
                     <label for="detail">詳細 <span>※任意</span></label><br>
-                    <textarea name="detail" id="detail" rows="8" cols="40" wrap="soft">{{ old('detail', $plan_data['detail']) }}</textarea><br>
+                    <textarea name="detail" id="detail" rows="8" cols="40" wrap="soft">{{ old('detail', is_array($plan_data) ? $plan_data['detail'] : $plan_data->detail) }}</textarea><br>
 
                     @if ($errors->has('detail'))
                     <p class="text-danger">{{ $errors->first('detail') }}</p>
                     @endif
                 </div><!-- detail -->
 
-                @if ($plan_data['share_users'])
+                @php $share_users = is_array($plan_data) ? $share_users : $plan_data->share_users; @endphp
+                @if ($share_users)
                 <div class="share-users-wrap">
                     <h2>予定共有</h2>
                     <div class="share-users">
@@ -97,8 +101,12 @@
                         </div><!-- radio-wrapper -->
 
                         <div id="share-checkbox" class="hide share-checkbox">
-                            @foreach ($plan_data['share_users'] as $share_user)
-                            <span class="input-wrap"><label><input type="checkbox" name="share_user[]" value="{{$share_user['share_id']}}">{{$share_user['name']}}</label></span>
+                            @foreach ($share_users as $share_user)
+                                <span class="input-wrap">
+                                    <label>
+                                        <input type="checkbox" name="share_user[]" value="{{ $share_user->share_id }}">{{ $share_user->name }}
+                                    </label>
+                                </span>
                             @endforeach
                         </div><!-- share-checkbox -->
                     </div><!-- share-users -->

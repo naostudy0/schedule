@@ -11,68 +11,90 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
+// 非ログインTOP
+Route::view('/', 'index')->name('index');
 
 Auth::routes();
-
-Route::get('/home', 'HomeController@index')->name('home');
-
-// 仮会員登録
-Route::post('register/pre_check', 'Auth\RegisterController@pre_check')->name('register.pre_check');
 
 // 確認メールからアクセス
 Route::get('register/verify/{token}', 'Auth\RegisterController@showForm');
 
-// 本会員登録
-Route::post('register/main_check', 'Auth\RegisterController@mainCheck')->name('register.main.check');
-Route::post('register/main_register', 'Auth\RegisterController@mainRegister')->name('register.main.registered');
+// 会員登録
+Route::group([
+    'prefix' => 'register',
+    'as' => 'register.'
+], function () {
+    // 仮登録
+    Route::post('pre_check', 'Auth\RegisterController@pre_check')->name('pre_check');
+    // 本登録
+    Route::post('main_check', 'Auth\RegisterController@mainCheck')->name('main.check');
+    Route::post('main_register', 'Auth\RegisterController@mainRegister')->name('main.registered');
+});
 
 // 予定管理画面
 Route::get('/schedule', 'ScheduleController@show')->name('schedule')->middleware('auth');
 
-// 予定作成
-Route::get('/plan/create', 'PlanController@planCreate')->name('plan.create')->middleware('auth');
-Route::post('/plan/create_confirm', 'PlanController@planConfirm')->name('plan.confirm')->middleware('auth');
-Route::post('/plan/create', 'PlanController@planReCreate')->name('plan.recreate')->middleware('auth');
-Route::post('/plan/store', 'PlanController@planStore')->name('plan.store')->middleware('auth');
-
-// 予定更新
-Route::get('/plan/update', 'PlanController@planUpdate')->name('plan.update');
-Route::post('/plan/update_confirm', 'PlanController@updateConfirm')->name('plan.update.confirm')->middleware('auth');
-Route::post('/plan/update_store', 'PlanController@updateStore')->name('plan.update.store')->middleware('auth');
-Route::post('/plan/update', 'PlanController@planReUpdate')->name('plan.reupdate')->middleware('auth');
-
-// 予定削除
-Route::get('/plan/delete_confirm', 'PlanController@deleteConfirm')->name('plan.delete.confirm')->middleware('auth');
-Route::get('/plan/delete', 'PlanController@deleteStore')->name('plan.delete')->middleware('auth');
+// 予定管理
+Route::group([
+    'prefix' => 'plan',
+    'as' => 'plan.',
+    'middleware' => 'auth'
+], function () {
+    // 作成
+    Route::get('create', 'PlanController@planCreate')->name('create');
+    Route::post('create_confirm', 'PlanController@planConfirm')->name('confirm');
+    Route::post('create', 'PlanController@planReCreate')->name('recreate');
+    Route::post('store', 'PlanController@planStore')->name('store');
+    // 更新
+    Route::get('update', 'PlanController@planUpdate')->name('update');
+    Route::post('update_confirm', 'PlanController@updateConfirm')->name('update.confirm');
+    Route::post('update_store', 'PlanController@updateStore')->name('update.store');
+    Route::post('update', 'PlanController@planReUpdate')->name('reupdate');
+    // 削除
+    Route::get('delete_confirm', 'PlanController@deleteConfirm')->name('delete.confirm');
+    Route::get('delete', 'PlanController@deleteStore')->name('delete');
+});
 
 // 会員情報
-Route::get('/customer', 'CustomerController@show')->name('customer.show')->middleware('auth');
+Route::group([
+    'prefix' => 'customer',
+    'as' => 'customer.',
+    'middleware' => 'auth'
+], function () {
+    // 会員情報一覧
+    Route::view('/', 'customer.index')->name('index');
+    // 名前変更
+    Route::view('registed_name_update', 'customer.name_update')->name('name.update');
+    Route::post('registed_name_store', 'CustomerController@registedNameStore')->name('name.store');
+    // パスワード変更
+    Route::view('registed_password_update', 'customer.password_update')->name('password.update');
+    Route::post('registed_password_store', 'CustomerController@registedPasswordStore')->name('password.store');
+    // メールアドレス変更
+    Route::view('registed_email_update', 'customer.email_update_check')->name('email.update');
+    Route::post('registed_email_confirm', 'CustomerController@registedEmailConfirm')->name('email.confirm');
+    // 退会
+    Route::view('delete_check', 'customer.delete.account_delete_confirm')->name('delete.confirm');
+    Route::get('delete_store', 'CustomerController@accountDeleteStore')->name('delete.store');
+});
 
-// 名前変更
-Route::get('/customer/registed_name_update', 'CustomerController@registedNameUpdate')->name('customer.name.update')->middleware('auth');
-Route::post('/customer/registed_name_store', 'CustomerController@registedNameStore')->name('customer.name.store')->middleware('auth');
-
-// パスワード変更
-Route::get('/customer/registed_password_update', 'CustomerController@registedPasswordUpdate')->name('customer.password.update')->middleware('auth');
-Route::post('/customer/registed_password_store', 'CustomerController@registedPasswordStore')->name('customer.password.store')->middleware('auth');
-
-// メールアドレス変更
-Route::get('/customer/registed_email_update', 'CustomerController@registedEmailUpdate')->name('customer.email.update')->middleware('auth');
-Route::post('/customer/registed_email_confirm', 'CustomerController@registedEmailConfirm')->name('customer.email.confirm')->middleware('auth');
 Route::get('/customer/registed_email/verify/{token}', 'CustomerController@emailUpdated')->name('customer.email.store');
 
 // 予定共有
-Route::get('/share', 'ShareController@show')->name('share.show')->middleware('auth');
-Route::post('/share', 'ShareController@changeShare')->name('share.change')->middleware('auth');
-Route::post('/share/request', 'ShareController@shareSearch')->name('share.request')->middleware('auth');
-Route::post('/share/request/permit', 'ShareController@sharePermit')->name('share.request.permit')->middleware('auth');
-Route::post('/share/send', 'ShareController@shareSend')->name('share.send')->middleware('auth');
-Route::post('/share/send/delete', 'ShareController@shareSendDelete')->name('share.send.delete')->middleware('auth');
-Route::post('/share/delete', 'ShareController@shareDelete')->name('share.delete')->middleware('auth');
+Route::group([
+    'prefix' => 'share',
+    'as' => 'share.',
+    'middleware' => 'auth'
+], function () {
+    Route::get('/', 'ShareController@show')->name('index');
+    Route::post('/change-id', 'ShareController@changeId')->name('change_id');
+    Route::post('/change-permit', 'ShareController@changePermit')->name('change_permit');
+    Route::post('/request', 'ShareController@shareSearch')->name('request');
+    Route::post('/request/permit', 'ShareController@sharePermit')->name('request.permit');
+    Route::post('/send', 'ShareController@shareSend')->name('send');
+    Route::post('/send/delete', 'ShareController@shareSendDelete')->name('send.delete');
+    Route::post('/delete', 'ShareController@shareDelete')->name('delete');
+});
 
-// 退会
-Route::get('/customer/delete_check', 'CustomerController@accountDeleteConfirm')->name('customer.delete.confirm')->middleware('auth');
-Route::get('/customer/delete_store', 'CustomerController@accountDeleteStore')->name('customer.delete.store')->middleware('auth');
+Route::get('/schedule-new/{any?}', function () {
+    return view('schedule-new.index');
+})->where('any', '.*');

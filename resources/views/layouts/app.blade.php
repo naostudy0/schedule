@@ -55,8 +55,8 @@
                             @endif
                         @else
                             <li class="nav-list">
-                                <a href="{{ route('share.show') }}" class="nav-menu"
-                                href="{{ route('share.show') }}";>
+                                <a href="{{ route('share.index') }}" class="nav-menu"
+                                href="{{ route('share.index') }}";>
                                 予定共有管理</a>
                             </li>
                             <li class="nav-item dropdown nav-list">
@@ -69,8 +69,8 @@
                                 
                                     <p class="user-name">{{ Auth::user()->name }}さん</p>
 
-                                    <a class="dropdown-item" href="{{ route('customer.show') }}"
-                                       onclick="location.href='{{ route('customer.show') }}'";>
+                                    <a class="dropdown-item" href="{{ route('customer.index') }}"
+                                       onclick="location.href='{{ route('customer.index') }}'";>
                                         会員情報確認
                                     </a>
 
