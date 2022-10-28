@@ -55,20 +55,21 @@ class ApiScheduleController extends Controller
         $plans = $this->plan->getMyPlansAndSharedPlans(new Carbon($date), Auth::id());
         if ($plans->isEmpty()) {
             return [
-                'plans' => [],
-                'days_have_plan' => [],
+                'planData' => [],
                 'shared_user_names' => [],
             ];
         }
 
-        $days_have_plan = [];
         $shared_user_names = [];
         foreach ($plans as $plan) {
-            $start_date = Carbon::parse($plan->start_datetime)->isoFormat('YYYY/MM/DD(ddd)');
-            if (! in_array($start_date, $days_have_plan)) {
-                // 予定のある日にちを設定
-                $days_have_plan[] = $start_date;
-            }
+            $plan_data[] = [
+                'planId'        => $plan->plan_id,
+                'content'       => $plan->content,
+                'detail'        => $plan->detail,
+                'startDatetime' => $plan->start_datetime,
+                'endDatetime'   => $plan->end_datetime,
+                'color'         => array_flip(config('const.plan_color'))[$plan->color],
+            ];
 
             $shared_user_ids = $plan->shared_user_ids ? explode(',', $plan->shared_user_ids) : false;
             if (! $shared_user_ids) {
@@ -80,11 +81,10 @@ class ApiScheduleController extends Controller
             }
         }
 
-        return [
-            'plans' => $plans,
-            'days_have_plan' => $days_have_plan,
+        return response()->json([
+            'planData' => $plan_data,
             'shared_user_names' => $shared_user_names,
-        ];
+        ]);
     }
 
     /**
