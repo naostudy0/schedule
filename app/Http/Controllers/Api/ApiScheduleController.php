@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Services\CalendarService;
 use App\Models\Plan;
@@ -84,6 +85,7 @@ class ApiScheduleController extends Controller
         return response()->json([
             'planData' => $plan_data,
             'shared_user_names' => $shared_user_names,
+            'colors' => array_flip(config('const.plan_color')),
         ]);
     }
 
@@ -95,7 +97,23 @@ class ApiScheduleController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $result = false;
+        $user_id = Auth::id();
+        if(! $user_id) {
+            return $result;
+        }
+
+        DB::beginTransaction();
+        try {
+            // 予定保存
+            $this->plan->storePlan($request, $user_id);
+            DB::commit();
+            $result = true;
+        } catch (\Exception $e) {
+            DB::rollback();
+        }
+
+        return $result;
     }
 
     /**

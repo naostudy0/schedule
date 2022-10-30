@@ -27,6 +27,7 @@
           :key="index"
           class="calendar-daily"
           :class="{notCurrentMonth: currentMonth !== day.month}"
+          @click="currentMonth === day.month ? show(day.date) : ''"
         >
           <!-- 日付 -->
           <div class="date">
@@ -45,11 +46,39 @@
         </div>
       </div>
     </div>
+    <!-- モーダル -->
+    <modal name="makePlanArea">
+      <form onsubmit="return false">
+        <!-- tokenはaxiosで設定されるため記載しない -->
+        <div class="modal-header">
+          <h2>予定入力</h2>
+        </div>
+        <div class="modal-body">
+          <label>開始日時<input
+            type="date"
+            name="start_date"
+            :value="modalDate"
+          ></label>
+          <input type="time" name="start_time" value="00:00">
+          <label>終了日時<input
+            type="date"
+            name="end_date"
+            :value="modalDate"
+          ></label>
+          <input type="time" name="end_time" value="00:00">
+
+          <label>内容<input type="text" name="content"></label>
+          <label>詳細<textarea name="detail"></textarea></label>
+          <button @click="storePlan">登録</button>
+          <button @click="hide">キャンセル</button>
+        </div>
+      </form>
+    </modal>
   </div>
 </template>
 
 <script>
-import moment from "moment";
+import moment from "moment"
 
 export default {
   data() {
@@ -58,6 +87,7 @@ export default {
       calendars: [],
       dayOfWeeks: ['日', '月', '火', '水', '木', '金', '土'],
       apiData: {},
+      modalDate: '',
     };
   },
   methods: {
@@ -152,12 +182,12 @@ export default {
     },
     /**
      * 対象の日の予定と個数を取得
-     * @param {object} event 
-     * @param {int}    dayOfWeekNum 
-     * @param {int}    stackIndex 
-     * @param {array}  dayEvents 
-     * @param {array}  startedEvents 
-     * @param {string} start 
+     * @param {object} event
+     * @param {int}    dayOfWeekNum
+     * @param {int}    stackIndex
+     * @param {array}  dayEvents
+     * @param {array}  startedEvents
+     * @param {string} start
      */
     getStackEvents(event, dayOfWeekNum, stackIndex, dayEvents, startedEvents, start){
       [stackIndex, dayEvents] = this.getStartedEvents(stackIndex, startedEvents, dayEvents)
@@ -172,9 +202,9 @@ export default {
     },
     /**
      * 開始された予定と個数を取得
-     * @param  {int}   stackIndex 
-     * @param  {array} startedEvents 
-     * @param  {array} dayEvents 
+     * @param  {int}   stackIndex
+     * @param  {array} startedEvents
+     * @param  {array} dayEvents
      * @return {int, object}
      */
     getStartedEvents(stackIndex, startedEvents, dayEvents){
@@ -224,11 +254,50 @@ export default {
       this.currentDate = moment(this.currentDate).subtract(1, "month")
       this.getCalendar()
     },
+    /**
+     * モーダル表示
+     * @param {string} date
+     * @return {void}
+     */
+    show(date) {
+      this.modalDate = date
+      this.$modal.show('makePlanArea');
+    },
+    /**
+     * モーダル非表示
+     * @return {void}
+     */
+    hide() {
+      this.$modal.hide('makePlanArea');
+    },
+    async storePlan() {
+      await axios.post('/api/schedule/store', this.getFormData())
+        .then(response => {
+          this.getApiData()
+          .then(response => {
+            this.getCalendar()
+          })
+        })
+        .then(response => {
+          this.hide()
+        })
+    },
+    getFormData() {
+      return {
+        start_date: document.getElementsByName('start_date').item(0).value,
+        start_time: document.getElementsByName('start_time').item(0).value,
+        end_date:   document.getElementsByName('end_date').item(0).value,
+        end_time:   document.getElementsByName('end_time').item(0).value,
+        color: 1,
+        content:    document.getElementsByName('content').item(0).value,
+        detail:     document.getElementsByName('detail').item(0).value,
+      }
+    }
   },
   created: function () {
     // APIでデータ取得
     this.getApiData()
-      .then(apiData => {
+      .then(response => {
         // 初回のカレンダー作成
         this.getCalendar()
       })

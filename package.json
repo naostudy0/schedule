@@ -28,6 +28,7 @@
     },
     "dependencies": {
         "moment": "^2.29.4",
+        "vue-js-modal": "^2.0.1",
         "vue-router": "^3.6.5"
     }
 }
