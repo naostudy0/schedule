@@ -67,6 +67,19 @@
           ></label>
           <input type="time" name="end_time" value="00:00">
 
+          <label v-if="Object.keys(apiData.data.colors).length">
+            <span
+              v-for="(color, n) in apiData.data.colors"
+            >
+              <input
+                name="color"
+                type="radio"
+                :value="n"
+              >
+              カラー{{ n }}
+            </span>
+          </label>
+
           <label>内容<input type="text" name="content"></label>
           <label>詳細<textarea name="detail"></textarea></label>
           <button @click="storePlan">登録</button>
@@ -123,37 +136,41 @@ export default {
       return endOfMonth.add(6 - dayOfWeekNum, 'd')
     },
     /**
-     * カレンダーに表示する日付を設定
+     * カレンダーに表示する日付と予定を設定
      * @return {void}
      */
     getCalendar() {
-      // カレンダーの最初の日付（日曜）
-      let startDate = this.getStartDate()
-      // カレンダーの最後の日付（土曜）
-      let endDate = this.getEndDate()
-      // 何週間か計算
-      let weekCount = Math.ceil(endDate.diff(startDate, 'd') / 7)
-      // 再描画時のために再度初期化
-      this.calendars = []
+      // APIでデータを取得
+      this.getApiData()
+      .then(response => {
+        // カレンダーの最初の日付（日曜）
+        let startDate = this.getStartDate()
+        // カレンダーの最後の日付（土曜）
+        let endDate = this.getEndDate()
+        // 何週間か計算
+        let weekCount = Math.ceil(endDate.diff(startDate, 'd') / 7)
+        // 再描画時のために再度初期化
+        this.calendars = []
 
-      let tmpDate = startDate
-      for (let week = 0; week < weekCount; week++) {
-        let tmpWeekData = []
-        for (let dayOfWeekNum = 0; dayOfWeekNum < 7; dayOfWeekNum++) {
-          tmpWeekData.push({
-            month: tmpDate.format('YYYY-MM'),
-            date:  tmpDate.format('YYYY-MM-DD'),
-            day:   tmpDate.format('D'),
-            dayOfWeekNum: dayOfWeekNum,
-            // 当月の場合のみ予定を取得
-            plans: tmpDate.format('YYYY-MM') === this.currentMonth
-                    ? this.getDayEvents(tmpDate.format('YYYY-MM-DD'), dayOfWeekNum)
-                    : [],
-          });
-          tmpDate.add(1, 'd')
+        let tmpDate = startDate
+        for (let week = 0; week < weekCount; week++) {
+          let tmpWeekData = []
+          for (let dayOfWeekNum = 0; dayOfWeekNum < 7; dayOfWeekNum++) {
+            tmpWeekData.push({
+              month: tmpDate.format('YYYY-MM'),
+              date:  tmpDate.format('YYYY-MM-DD'),
+              day:   tmpDate.format('D'),
+              dayOfWeekNum: dayOfWeekNum,
+              // 当月の場合のみ予定を取得
+              plans: tmpDate.format('YYYY-MM') === this.currentMonth
+                      ? this.getDayEvents(tmpDate.format('YYYY-MM-DD'), dayOfWeekNum)
+                      : [],
+            });
+            tmpDate.add(1, 'd')
+          }
+          this.calendars.push(tmpWeekData)
         }
-        this.calendars.push(tmpWeekData)
-      }
+      })
     },
     /**
      * 対象の日の予定を取得
@@ -226,7 +243,7 @@ export default {
      * @param  {int}    day
      * @return {int}
      */
-     getEventWidth(start, end, day) {
+    getEventWidth(start, end, day) {
       let diffDays = moment(end).diff(moment(start), 'd')
       let width = 0
 
@@ -272,35 +289,38 @@ export default {
     },
     async storePlan() {
       await axios.post('/api/schedule/store', this.getFormData())
-        .then(response => {
-          this.getApiData()
-          .then(response => {
-            this.getCalendar()
-          })
-        })
-        .then(response => {
-          this.hide()
-        })
+      .then(response => {
+        this.getCalendar()
+      })
+      .then(response => {
+        this.hide()
+      })
     },
     getFormData() {
+      let elements = document.getElementsByName('color');
+      let len = elements.length;
+      let checkValue = 0;
+
+      for (let i = 0; i < len; i++) {
+        if (elements.item(i).checked) {
+          checkValue = elements.item(i).value;
+        }
+      }
+
       return {
         start_date: document.getElementsByName('start_date').item(0).value,
         start_time: document.getElementsByName('start_time').item(0).value,
         end_date:   document.getElementsByName('end_date').item(0).value,
         end_time:   document.getElementsByName('end_time').item(0).value,
-        color: 1,
+        color:      checkValue,
         content:    document.getElementsByName('content').item(0).value,
         detail:     document.getElementsByName('detail').item(0).value,
       }
     }
   },
   created: function () {
-    // APIでデータ取得
-    this.getApiData()
-      .then(response => {
-        // 初回のカレンダー作成
-        this.getCalendar()
-      })
+    // 初回のカレンダー作成
+    this.getCalendar()
   },
   computed: {
     displayDate() {
