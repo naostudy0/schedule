@@ -42,13 +42,13 @@
           <div class="date">
             {{ day.day }}
           </div>
-          <!-- 予定 -->
+          <!-- 予定（共有された予定はドラッグ不可） -->
           <div
             v-for="plan in day.plans"
             :key="plan.planId"
             class="plan"
             :style="`width:${plan.width}%;background-color:${plan.color}`"
-            draggable="true"
+            :draggable="! (plan.planMadeUserId !== null && plan.planMadeUserId !== apiData.data.userId)"
             @drag="setDragPlanId(plan.planId)"
             @click.stop="update(plan)"
           >
@@ -67,30 +67,38 @@
         >
           <h2>予定入力</h2>
         </div>
-        <div class="modal-body">
+        <div
+          class="modal-body"
+          v-if="Object.keys(apiData).length"
+        >
           <div>
-            <label>開始日時<input
+            <label>開始日時
+              <input
               type="date"
-              name="start_date"
+              name="startDate"
               v-model="modalData.startDate"
+              :readonly="isSharedPlan"
               @blur="validateDateTime()"
             ></label>
             <input
               type="time"
-              name="start_time"
+              name="startTime"
               v-model="modalData.startTime"
+              :readonly="isSharedPlan"
               @blur="validateDateTime()"
             >
             <label>終了日時<input
               type="date"
-              name="end_date"
+              name="endDate"
               v-model="modalData.endDate"
+              :readonly="isSharedPlan"
               @blur="validateDateTime()"
             ></label>
             <input
               type="time"
-              name="end_time"
+              name="endTime"
               v-model="modalData.endTime"
+              :readonly="isSharedPlan"
               @blur="validateDateTime()"
             >
           </div>
@@ -100,8 +108,9 @@
             </span>
           </div>
 
-          <span>カラー</span>
-          <div v-if="Object.keys(apiData).length">
+          <!-- 共有された予定の場合は非表示 -->
+          <div v-if="! isSharedPlan">
+            <span>カラー</span>
             <span
               v-for="(color, index) in apiData.data.colorsFlip"
               :key="index"
@@ -124,6 +133,7 @@
                 type="text"
                 name="content"
                 v-model="modalData.content"
+                :readonly="isSharedPlan"
                 @blur="validateContent()"
               >
             </label>
@@ -138,16 +148,68 @@
             <label>詳細
               <textarea
                 name="detail"
+                :readonly="isSharedPlan"
               >{{ modalData.detail }}</textarea>
             </label>
           </div>
+
+          <div v-if="! isSharedPlan">
+            予定共有
+            <span v-for="shareUser in apiData.data.shareUsers">
+              <label>
+                <input
+                  type="checkbox"
+                  name="shareUser"
+                  :value="shareUser.share_id"
+                >
+                {{ shareUser.name }}
+              </label>
+            </span>
+          </div>
+
+          <div
+            v-if="apiData.data.sharedUserNames[updatePlanId] !== undefined"
+          >
+            <span
+              v-if="updatePlanId !== 0 && modalData.planMadeUserId !== apiData.data.userId"
+            >
+              この予定は、{{ modalData.planMadeUserName }} さんに共有されています
+            </span>
+          </div>
+
+          <div
+            v-if="apiData.data.sharedUserNames[updatePlanId] !== undefined"
+          >
+            <ul v-for="(userName, userId) in apiData.data.sharedUserNames[updatePlanId]"
+              :key="userId"
+            >
+              <li v-if="userId != apiData.data.userId">
+                {{ userName }}さん
+              </li>
+            </ul>
+            <span
+              v-if="Object.keys(apiData.data.sharedUserNames[updatePlanId]).length === 1
+                && modalData.planMadeUserId === apiData.data.userId"
+            >
+            <!-- 共有が一人で作成者が自分ではない場合は、自分だけが共有された人になり名前を表示しないので以下も非表示 -->
+              と共有しています
+            </span>
+          </div>
+
           <span v-if="updatePlanId === 0">
             <button @click="isAfterInput ? storePlan() : validateBeforeInput()">登録</button>
+            <button @click="hide">キャンセル</button>
           </span>
           <span v-else>
-            <button @click="isAfterInput ? updatePlan() : validateBeforeInput()">更新</button>
+            <span v-if="isSharedPlan">
+              <!-- 自分が作成していない予定は更新させない -->
+              <button @click="hide">閉じる</button>
+            </span>
+            <span v-else>
+              <button @click="isAfterInput ? updatePlan() : validateBeforeInput()">更新</button>
+              <button @click="hide">キャンセル</button>
+            </span>
           </span>
-          <button @click="hide">キャンセル</button>
         </div>
       </form>
     </modal>
@@ -361,6 +423,8 @@ export default {
         color: 1,
         content: '',
         detail: '',
+        planMadeUserId: 0,
+        planMadeUserName: '',
       }
 
       // 更新予定IDの初期化
@@ -385,13 +449,20 @@ export default {
         startTime: moment(plan.startDatetime).format('HH:mm'),
         endDate:   moment(plan.endDatetime).format('YYYY-MM-DD'),
         endTime:   moment(plan.endDatetime).format('HH:mm'),
-        color:     plan.color,
-        content:   plan.content,
-        detail:    plan.detail,
+        color:            plan.color,
+        content:          plan.content,
+        detail:           plan.detail,
+        planMadeUserId:   plan.planMadeUserId,
+        planMadeUserName: plan.planMadeUserName,
       }
 
       // 更新する予定ID（フォームに入れる必要がないので別で設定）
       this.updatePlanId = plan.planId
+
+      // バリデーションの初期化
+      this.validate.datetime = true
+      this.validate.content = true
+      this.beforeInput = false
 
       // モーダルで選択状態にする色番号
       this.colorNum = this.apiData.data.colors[plan.color]
@@ -437,25 +508,34 @@ export default {
      * @return {object}
      */
     getFormData() {
-      let elements = document.getElementsByName('color');
-      let len = elements.length;
+      let elementsColor = document.getElementsByName('color')
+      let lenColor = elementsColor.length
       let checkValue = 0;
+      for (let i = 0; i < lenColor; i++) {
+        if (elementsColor.item(i).checked) {
+          checkValue = elementsColor.item(i).value;
+        }
+      }
 
-      for (let i = 0; i < len; i++) {
-        if (elements.item(i).checked) {
-          checkValue = elements.item(i).value;
+      let elementsShareUser = document.getElementsByName('shareUser')
+      let lenShareUser = elementsShareUser.length
+      let checkArr = []
+      for (let i = 0; i < lenShareUser; i++) {
+        if (elementsShareUser.item(i).checked) {
+          checkArr.push(elementsShareUser.item(i).value)
         }
       }
 
       return {
-        start_date: document.getElementsByName('start_date').item(0).value,
-        start_time: document.getElementsByName('start_time').item(0).value,
-        end_date:   document.getElementsByName('end_date').item(0).value,
-        end_time:   document.getElementsByName('end_time').item(0).value,
+        start_date: document.getElementsByName('startDate').item(0).value,
+        start_time: document.getElementsByName('startTime').item(0).value,
+        end_date:   document.getElementsByName('endDate').item(0).value,
+        end_time:   document.getElementsByName('endTime').item(0).value,
         color:      checkValue,
         content:    document.getElementsByName('content').item(0).value,
         detail:     document.getElementsByName('detail').item(0).value,
         plan_id:    this.updatePlanId,
+        share_user: checkArr,
       }
     },
     /**
@@ -496,10 +576,10 @@ export default {
       // 未入力フラグの更新
       this.beforeInput = false
 
-      let startDate = document.getElementsByName('start_date').item(0).value
-      let startTime = document.getElementsByName('start_time').item(0).value
-      let endDate   = document.getElementsByName('end_date').item(0).value
-      let endTime   = document.getElementsByName('end_time').item(0).value
+      let startDate = document.getElementsByName('startDate').item(0).value
+      let startTime = document.getElementsByName('startTime').item(0).value
+      let endDate   = document.getElementsByName('endDate').item(0).value
+      let endTime   = document.getElementsByName('endTime').item(0).value
 
       let startDateTime = moment(startDate + ' ' + startTime)
       let endDateTime   = moment(endDate + ' ' + endTime)
@@ -562,9 +642,18 @@ export default {
       if (! Object.keys(this.apiData).length || this.beforeInput) {
         return false
       }
-
-      // エラーがなければtrue
+      // バリデーションエラーがなければtrue
       return this.validate.content && this.validate.datetime
+    },
+    /**
+     * 共有された予定か判定
+     * @return {bool}
+     */
+    isSharedPlan() {
+      if (this.modalData.planMadeUserId === 0) {
+        return false
+      }
+      return this.modalData.planMadeUserId && this.modalData.planMadeUserId !== this.apiData.data.userId
     }
   },
 }

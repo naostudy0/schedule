@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Plan;
 use App\Models\PlanShare;
 use App\Models\User;
+use App\Models\ShareUser;
 use Carbon\Carbon;
 use Auth;
 
@@ -26,6 +27,10 @@ class ApiScheduleController extends Controller
      * @var \App\Models\User
      */
     private $user;
+    /**
+     * @var \App\Models\ShareUser
+     */
+    private $share_user;
 
     /**
      * コンストラクタ
@@ -35,6 +40,7 @@ class ApiScheduleController extends Controller
         $this->plan = new Plan;
         $this->plan_share = new PlanShare;
         $this->user = new User;
+        $this->share_user = new ShareUser;
     }
 
     /**
@@ -54,28 +60,34 @@ class ApiScheduleController extends Controller
 
         // 自分の予定と共有された予定を取得
         $plans = $this->plan->getMyPlansAndSharedPlans(new Carbon($date), Auth::id());
+        // 予定共有設定をしているユーザーを取得
+        $share_users = $this->share_user->getShareUserData(Auth::id());
         // 予定に使用可能な色
         $plan_colors = config('const.plan_color');
         // jsはキーと値を入れ替えるメソッドがないのでphpで処理
         $plan_colors_flip = array_flip($plan_colors);
         if ($plans->isEmpty()) {
             return response()->json([
+                'userId' => Auth::id(),
                 'planData' => [],
                 'sharedUserNames' => [],
                 'colors' => $plan_colors,
                 'colorsFlip' => $plan_colors_flip,
+                'shareUsers' => $share_users,
             ]);
         }
 
         $shared_user_names = [];
         foreach ($plans as $plan) {
             $plan_data[] = [
-                'planId'        => $plan->plan_id,
-                'content'       => $plan->content,
-                'detail'        => $plan->detail,
-                'startDatetime' => $plan->start_datetime,
-                'endDatetime'   => $plan->end_datetime,
-                'color'         => $plan_colors_flip[$plan->color],
+                'planId'         => $plan->plan_id,
+                'content'        => $plan->content,
+                'detail'         => $plan->detail,
+                'startDatetime'  => $plan->start_datetime,
+                'endDatetime'    => $plan->end_datetime,
+                'color'          => $plan_colors_flip[$plan->color],
+                'planMadeUserId' => $plan->plan_made_user_id,
+                'planMadeUserName' => $plan->made_user_name,
             ];
 
             $shared_user_ids = $plan->shared_user_ids ? explode(',', $plan->shared_user_ids) : false;
@@ -89,10 +101,12 @@ class ApiScheduleController extends Controller
         }
 
         return response()->json([
+            'userId' => Auth::id(),
             'planData' => $plan_data,
             'sharedUserNames' => $shared_user_names,
             'colors' => $plan_colors,
             'colorsFlip' => $plan_colors_flip,
+            'shareUsers' => $share_users,
         ]);
     }
 
