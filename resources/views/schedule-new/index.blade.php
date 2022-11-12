@@ -1,17 +1,9 @@
-<!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
- 
-<head>
-    <meta charset="UTF-8">
-    <title>サンプル</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <script src="{{ asset('js/app.js') }}" defer></script>
-</head>
- 
-<body>
-    <div id="app">
-        <router-view />
-    </div>
-</body>
- 
-</html>
+@extends('layouts.base')
+
+@section('head_script')
+<script src="{{ asset('js/app.js') }}" defer></script>
+@endsection
+
+@section('content')
+<router-view />
+@endsection

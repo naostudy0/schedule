@@ -131,7 +131,7 @@ class Plan extends Model
         }
 
         DB::table($this->table)
-            ->where('plan_id', $request->id)
+            ->where('plan_id', $request->plan_id)
             ->update([
                 'start_datetime' => $request->start_date . ' ' . $request->start_time,
                 'end_datetime' => $request->end_date . ' ' . $request->end_time,
@@ -141,14 +141,14 @@ class Plan extends Model
             ]);
 
         DB::table('plan_share')
-            ->where('plan_id', $request->id)
+            ->where('plan_id', $request->plan_id)
             ->delete();
         
         if ($shared_user_ids) {
             foreach ($shared_user_ids as $shared_user_id) {
                 DB::table('plan_share')
                     ->insert([
-                        'plan_id' => $request->id,
+                        'plan_id' => $request->plan_id,
                         'plan_made_user_id' => $user_id,
                         'plan_shared_user_id' => $shared_user_id,
                         'created_at'    => Carbon::now(),

@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
-use App\Services\CalendarService;
 use App\Models\Plan;
 use App\Models\PlanShare;
 use App\Models\User;
@@ -56,13 +55,16 @@ class ApiScheduleController extends Controller
         // 自分の予定と共有された予定を取得
         $plans = $this->plan->getMyPlansAndSharedPlans(new Carbon($date), Auth::id());
         // 予定に使用可能な色
-        $plan_colors = array_flip(config('const.plan_color'));
+        $plan_colors = config('const.plan_color');
+        // jsはキーと値を入れ替えるメソッドがないのでphpで処理
+        $plan_colors_flip = array_flip($plan_colors);
         if ($plans->isEmpty()) {
-            return [
+            return response()->json([
                 'planData' => [],
-                'shared_user_names' => [],
+                'sharedUserNames' => [],
                 'colors' => $plan_colors,
-            ];
+                'colorsFlip' => $plan_colors_flip,
+            ]);
         }
 
         $shared_user_names = [];
@@ -73,7 +75,7 @@ class ApiScheduleController extends Controller
                 'detail'        => $plan->detail,
                 'startDatetime' => $plan->start_datetime,
                 'endDatetime'   => $plan->end_datetime,
-                'color'         => $plan_colors[$plan->color],
+                'color'         => $plan_colors_flip[$plan->color],
             ];
 
             $shared_user_ids = $plan->shared_user_ids ? explode(',', $plan->shared_user_ids) : false;
@@ -88,8 +90,9 @@ class ApiScheduleController extends Controller
 
         return response()->json([
             'planData' => $plan_data,
-            'shared_user_names' => $shared_user_names,
+            'sharedUserNames' => $shared_user_names,
             'colors' => $plan_colors,
+            'colorsFlip' => $plan_colors_flip,
         ]);
     }
 
@@ -101,15 +104,15 @@ class ApiScheduleController extends Controller
      */
     public function store(Request $request)
     {
-        $result = false;
+        $result = ['result' => false];
         $user_id = Auth::id();
-        if(! $user_id) {
-            return $result;
+        if (! $user_id) {
+            return response()->json($result);
         }
 
         $validator = $this->validator($request->all());
         if ($validator->fails()) {
-            return $result;
+            return response()->json($result);
         }
 
         DB::beginTransaction();
@@ -117,12 +120,12 @@ class ApiScheduleController extends Controller
             // 予定保存
             $this->plan->storePlan($request, $user_id);
             DB::commit();
-            $result = true;
+            $result = ['result' => true];
         } catch (\Exception $e) {
             DB::rollback();
         }
 
-        return $result;
+        return response()->json($result);
     }
 
     /**
@@ -148,36 +151,57 @@ class ApiScheduleController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $result = ['result' => false];
+        $user_id = Auth::id();
+        if (! $user_id) {
+            return response()->json($result);
+        }
+
+        $exists = $this->plan->where('user_id', $user_id)->where('plan_id', $request->input('plan_id'))->exists();
+
+        $validator = $this->validator($request->all());
+        if (! $exists || $validator->fails()) {
+            return response()->json($result);
+        }
+
+        DB::beginTransaction();
+        try {
+            // 予定更新
+            $this->plan->updatePlan($request, $user_id);
+            DB::commit();
+            $result = ['result' => true];
+        } catch (\Exception $e) {
+            DB::rollback();
+        }
+
+        return response()->json($result);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * 予定削除
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        //
+        $result = ['result' => false];
+        $user_id = Auth::id();
+        if (! $user_id) {
+            return response()->json($result);
+        }
+
+        $this->plan->where('user_id', $user_id)
+            ->where('plan_id', $id)
+            ->delete();
+
+        return;
     }
 }

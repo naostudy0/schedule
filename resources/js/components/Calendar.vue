@@ -1,5 +1,11 @@
 <template>
   <div class="content">
+    <div class="icon-wrap"
+      @drop="onAlert"
+      @dragover.prevent
+    >
+      <font-awesome-icon icon="fa-solid fa-trash-can" class="fa-2x"/>
+    </div>
     <div class="title">
       <h1>{{ displayDate }}</h1>
       <div class="button-area">
@@ -7,7 +13,10 @@
         <button @click="nextMonth">翌月</button>
       </div>
     </div>
-    <div class="calendar">
+    <div
+      class="calendar"
+      v-if="Object.keys(apiData).length"
+    >
       <div class="week">
         <!-- 曜日表示箇所 -->
         <div
@@ -40,6 +49,8 @@
             class="plan"
             :style="`width:${plan.width}%;background-color:${plan.color}`"
             draggable="true"
+            @drag="setDragPlanId(plan.planId)"
+            @click.stop="update(plan)"
           >
             {{ (plan.startDatetime.substr(0, 10) === day.date || day.dayOfWeekNum === 0) ? plan.content : '' }}
           </div>
@@ -50,39 +61,58 @@
     <modal name="makePlanArea">
       <form onsubmit="return false">
         <!-- tokenはaxiosで設定されるため記載しない -->
-        <div class="modal-header">
+        <div
+          class="modal-header"
+          :style="`background-color:${modalColor}`"
+        >
           <h2>予定入力</h2>
         </div>
         <div class="modal-body">
-          <label>開始日時<input
-            type="date"
-            name="start_date"
-            :value="modalDate"
-          ></label>
-          <input type="time" name="start_time" value="00:00">
-          <label>終了日時<input
-            type="date"
-            name="end_date"
-            :value="modalDate"
-          ></label>
-          <input type="time" name="end_time" value="00:00">
+          <div>
+            <label>開始日時<input
+              type="date"
+              name="start_date"
+              :value="modalData.startDate"
+            ></label>
+            <input type="time" name="start_time" :value="modalData.startTime">
+            <label>終了日時<input
+              type="date"
+              name="end_date"
+              :value="modalData.endDate"
+            ></label>
+            <input type="time" name="end_time" :value="modalData.endTime">
+          </div>
 
-          <label v-if="Object.keys(apiData.data.colors).length">
+          <span>カラー</span>
+          <div v-if="Object.keys(apiData).length">
             <span
-              v-for="(color, n) in apiData.data.colors"
+              v-for="(color, index) in apiData.data.colorsFlip"
+              :key="index"
             >
-              <input
-                name="color"
-                type="radio"
-                :value="n"
-              >
-              カラー{{ n }}
+            <label>
+                <input
+                  name="color"
+                  type="radio"
+                  :value="index"
+                  v-model="colorNum"
+                >
+                {{ index + ': ' + color }}
+              </label>
             </span>
-          </label>
+          </div>
 
-          <label>内容<input type="text" name="content"></label>
-          <label>詳細<textarea name="detail"></textarea></label>
-          <button @click="storePlan">登録</button>
+          <div>
+            <label>内容<input type="text" name="content" :value="modalData.content"></label>
+          </div>
+          <div>
+            <label>詳細<textarea name="detail">{{ modalData.detail }}</textarea></label>
+          </div>
+          <span v-if="updatePlanId === 0">
+            <button @click="storePlan">登録</button>
+          </span>
+          <span v-else>
+            <button @click="updatePlan">更新</button>
+          </span>
           <button @click="hide">キャンセル</button>
         </div>
       </form>
@@ -100,7 +130,10 @@ export default {
       calendars: [],
       dayOfWeeks: ['日', '月', '火', '水', '木', '金', '土'],
       apiData: {},
-      modalDate: '',
+      modalData: {},
+      dragPlanId: '',
+      colorNum: 1,
+      updatePlanId: 0,
     };
   },
   methods: {
@@ -259,8 +292,10 @@ export default {
      * 次月のカレンダーを表示
      * @return {void}
      */
-     nextMonth() {
+    nextMonth() {
       this.currentDate = moment(this.currentDate).add(1, "month")
+      // 月の表示が切り替わるときに前のカレンダーの表示が残ってしまうため初期化
+      this.apiData = {}
       this.getCalendar()
     },
     /**
@@ -269,15 +304,54 @@ export default {
      */
     prevMonth() {
       this.currentDate = moment(this.currentDate).subtract(1, "month")
+      // 月の表示が切り替わるときに前のカレンダーの表示が残ってしまうため初期化
+      this.apiData = {}
       this.getCalendar()
     },
     /**
      * モーダル表示
-     * @param {string} date
+     * @param  {string} date
      * @return {void}
      */
     show(date) {
-      this.modalDate = date
+      this.modalData = {
+        startDate: date,
+        startTime: '00:00',
+        endDate: date,
+        endTime: '00:00',
+        color: 1,
+        content: '',
+        detail: '',
+      }
+
+      // 更新予定IDの初期化
+      this.updatePlanId = 0
+
+      // モーダルで選択状態にする色番号
+      this.colorNum = this.modalData.color
+      this.$modal.show('makePlanArea');
+    },
+    /**
+     * モーダル表示
+     * @param  {string} date
+     * @return {void}
+     */
+    update(plan) {
+      this.modalData = {
+        startDate: moment(plan.startDatetime).format('YYYY-MM-DD'),
+        startTime: moment(plan.startDatetime).format('HH:mm'),
+        endDate:   moment(plan.endDatetime).format('YYYY-MM-DD'),
+        endTime:   moment(plan.endDatetime).format('HH:mm'),
+        color:     plan.color,
+        content:   plan.content,
+        detail:    plan.detail,
+      }
+
+      // 更新する予定ID（フォームに入れる必要がないので別で設定）
+      this.updatePlanId = plan.planId
+
+      // モーダルで選択状態にする色番号
+      this.colorNum = this.apiData.data.colors[plan.color]
       this.$modal.show('makePlanArea');
     },
     /**
@@ -287,6 +361,10 @@ export default {
     hide() {
       this.$modal.hide('makePlanArea');
     },
+    /**
+     * 予定保存
+     * @return {void}
+     */
     async storePlan() {
       await axios.post('/api/schedule/store', this.getFormData())
       .then(response => {
@@ -295,7 +373,26 @@ export default {
       .then(response => {
         this.hide()
       })
+      .catch(response => response)
     },
+    /**
+     * 予定更新
+     * @return {void}
+     */
+     async updatePlan() {
+      await axios.post('/api/schedule/update', this.getFormData())
+      .then(response => {
+        this.getCalendar()
+      })
+      .then(response => {
+        this.hide()
+      })
+      .catch(response => response)
+    },
+    /**
+     * フォームの入力値を取得
+     * @return {object}
+     */
     getFormData() {
       let elements = document.getElementsByName('color');
       let len = elements.length;
@@ -315,7 +412,38 @@ export default {
         color:      checkValue,
         content:    document.getElementsByName('content').item(0).value,
         detail:     document.getElementsByName('detail').item(0).value,
+        plan_id:    this.updatePlanId,
       }
+    },
+    /**
+     * ドラッグしている予定のIDを設定
+     * @param  {int} planId
+     * @return {void}
+     */
+    setDragPlanId(planId) {
+      this.dragPlanId = planId
+    },
+    /**
+     * 予定削除の確認画面表示
+     * @return {void}
+     */
+    onAlert() {
+      this.$dialog
+      .confirm({
+        title: '予定削除',
+        body: '予定を削除してもよろしいですか？'
+      }, {
+        okText: 'はい',
+        cancelText: 'キャンセル',
+      })
+      .then(response => {
+        axios.get('/api/schedule/destroy/' + this.dragPlanId)
+      })
+      .then(response => {
+        // 予定削除後にカレンダー再描画
+        this.getCalendar()
+      })
+      .catch(response => response)
     }
   },
   created: function () {
@@ -328,6 +456,9 @@ export default {
     },
     currentMonth() {
       return this.currentDate.format('YYYY-MM')
+    },
+    modalColor() {
+      return Object.keys(this.apiData).length ? this.apiData.data.colorsFlip[this.colorNum] : 'white'
     },
   },
 }
@@ -348,11 +479,13 @@ export default {
   border-top:1px solid #E0E0E0;
   font-size:0.8em;
 }
+
 .week {
   display:flex;
   border-left:1px solid #E0E0E0;
   /* background-color: black; */
 }
+
 .calendar-daily{
   flex:1;
   min-height:125px;
@@ -360,6 +493,7 @@ export default {
   border-bottom:1px solid #E0E0E0;
   margin-right:-1px;
 }
+
 .date {
   text-align: center;
 }
@@ -388,5 +522,16 @@ export default {
 
 .title {
   text-align: center;
+}
+
+div.content {
+  position: relative;
+}
+
+div.icon-wrap {
+  position: absolute;
+  padding: 5%;
+  right: 0;
+  opacity: 0.3;
 }
 </style>

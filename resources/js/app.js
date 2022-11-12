@@ -20,9 +20,23 @@ window.Vue = require('vue').default;
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 import router from "./routes/router";
-import VModal from 'vue-js-modal'
 
+// VModal
+import VModal from 'vue-js-modal'
 Vue.use(VModal)
+
+// Font awesome
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+library.add(fas)
+Vue.component('font-awesome-icon', FontAwesomeIcon)
+
+// VuejsDialog
+import VuejsDialog from 'vuejs-dialog'
+import 'vuejs-dialog/dist/vuejs-dialog.min.css'
+Vue.use(VuejsDialog);
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application

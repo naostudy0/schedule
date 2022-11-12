@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.base')
 
 @section('content')
 <div class="share">
@@ -172,7 +172,8 @@
 @endsection
 
 
-@section('script')
+@section('body_script')
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
 $(function(){
     $('.id-change-btn').on('click', function(){
