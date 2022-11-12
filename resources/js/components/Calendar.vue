@@ -72,15 +72,32 @@
             <label>開始日時<input
               type="date"
               name="start_date"
-              :value="modalData.startDate"
+              v-model="modalData.startDate"
+              @blur="validateDateTime()"
             ></label>
-            <input type="time" name="start_time" :value="modalData.startTime">
+            <input
+              type="time"
+              name="start_time"
+              v-model="modalData.startTime"
+              @blur="validateDateTime()"
+            >
             <label>終了日時<input
               type="date"
               name="end_date"
-              :value="modalData.endDate"
+              v-model="modalData.endDate"
+              @blur="validateDateTime()"
             ></label>
-            <input type="time" name="end_time" :value="modalData.endTime">
+            <input
+              type="time"
+              name="end_time"
+              v-model="modalData.endTime"
+              @blur="validateDateTime()"
+            >
+          </div>
+          <div v-if="! validate.datetime">
+            <span class="error">
+              終了日時は開始時間より後の日時を入力してください
+            </span>
           </div>
 
           <span>カラー</span>
@@ -102,16 +119,33 @@
           </div>
 
           <div>
-            <label>内容<input type="text" name="content" :value="modalData.content"></label>
+            <label>内容
+              <input
+                type="text"
+                name="content"
+                v-model="modalData.content"
+                @blur="validateContent()"
+              >
+            </label>
           </div>
+          <div v-if="! validate.content">
+            <span class="error">
+              内容は必須です
+            </span>
+          </div>
+
           <div>
-            <label>詳細<textarea name="detail">{{ modalData.detail }}</textarea></label>
+            <label>詳細
+              <textarea
+                name="detail"
+              >{{ modalData.detail }}</textarea>
+            </label>
           </div>
           <span v-if="updatePlanId === 0">
-            <button @click="storePlan">登録</button>
+            <button @click="isAfterInput ? storePlan() : validateBeforeInput()">登録</button>
           </span>
           <span v-else>
-            <button @click="updatePlan">更新</button>
+            <button @click="isAfterInput ? updatePlan() : validateBeforeInput()">更新</button>
           </span>
           <button @click="hide">キャンセル</button>
         </div>
@@ -134,6 +168,11 @@ export default {
       dragPlanId: '',
       colorNum: 1,
       updatePlanId: 0,
+      validate: {
+        datetime: true,
+        content: true,
+      },
+      beforeInput: true
     };
   },
   methods: {
@@ -327,13 +366,17 @@ export default {
       // 更新予定IDの初期化
       this.updatePlanId = 0
 
+      // バリデーションの初期化
+      this.validate.datetime = true
+      this.validate.content = true
+      this.beforeInput = true
+
       // モーダルで選択状態にする色番号
       this.colorNum = this.modalData.color
       this.$modal.show('makePlanArea');
     },
     /**
-     * モーダル表示
-     * @param  {string} date
+     * 予定更新
      * @return {void}
      */
     update(plan) {
@@ -352,14 +395,14 @@ export default {
 
       // モーダルで選択状態にする色番号
       this.colorNum = this.apiData.data.colors[plan.color]
-      this.$modal.show('makePlanArea');
+      this.$modal.show('makePlanArea')
     },
     /**
      * モーダル非表示
      * @return {void}
      */
     hide() {
-      this.$modal.hide('makePlanArea');
+      this.$modal.hide('makePlanArea')
     },
     /**
      * 予定保存
@@ -444,6 +487,44 @@ export default {
         this.getCalendar()
       })
       .catch(response => response)
+    },
+    /**
+     * 日付のバリデーション
+     * @return {void}
+     */
+    validateDateTime() {
+      // 未入力フラグの更新
+      this.beforeInput = false
+
+      let startDate = document.getElementsByName('start_date').item(0).value
+      let startTime = document.getElementsByName('start_time').item(0).value
+      let endDate   = document.getElementsByName('end_date').item(0).value
+      let endTime   = document.getElementsByName('end_time').item(0).value
+
+      let startDateTime = moment(startDate + ' ' + startTime)
+      let endDateTime   = moment(endDate + ' ' + endTime)
+
+      this.validate.datetime = startDateTime.isSameOrBefore(endDateTime)
+    },
+    /**
+     * 内容のバリデーション
+     * @return {void}
+     */
+    validateContent() {
+      // 未入力フラグの更新
+      this.beforeInput = false
+
+      let content = document.getElementsByName('content').item(0).value
+
+      this.validate.content = content !== ''
+    },
+    /**
+     * フォーム未入力で送信ボタンを押したときにバリデーションする
+     * @return {void}
+     */
+    validateBeforeInput() {
+      this.validateDateTime()
+      this.validateContent()
     }
   },
   created: function () {
@@ -451,15 +532,40 @@ export default {
     this.getCalendar()
   },
   computed: {
+    /**
+     * 画面に表示する年月
+     * @return {string}
+     */
     displayDate() {
       return this.currentDate.format('YYYY[年]M[月]')
     },
+    /**
+     * 現在表示している年月（当月か判定で使用）
+     * @return {string}
+     */
     currentMonth() {
       return this.currentDate.format('YYYY-MM')
     },
+    /**
+     * モーダルで選択状態にする色
+     * @return {string}
+     */
     modalColor() {
       return Object.keys(this.apiData).length ? this.apiData.data.colorsFlip[this.colorNum] : 'white'
     },
+    /**
+     * フォーム入力が完了したか判定
+     * @return {bool}
+     */
+    isAfterInput() {
+      // 描画前のエラー対策と未入力の場合は登録できないようにする
+      if (! Object.keys(this.apiData).length || this.beforeInput) {
+        return false
+      }
+
+      // エラーがなければtrue
+      return this.validate.content && this.validate.datetime
+    }
   },
 }
 </script>
@@ -483,7 +589,6 @@ export default {
 .week {
   display:flex;
   border-left:1px solid #E0E0E0;
-  /* background-color: black; */
 }
 
 .calendar-daily{
@@ -533,5 +638,9 @@ div.icon-wrap {
   padding: 5%;
   right: 0;
   opacity: 0.3;
+}
+
+span.error {
+  color: red;
 }
 </style>
