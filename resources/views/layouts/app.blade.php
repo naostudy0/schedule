@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+    <link href="{{ asset('css/app_old.css') }}?{{ date('Ymd') }}" rel="stylesheet">
     <link href="{{ asset('css/register.css') }}?{{ date('Ymd') }}" rel="stylesheet">
     <link href="{{ asset('css/schedule.css') }}?{{ date('Ymd') }}" rel="stylesheet">
     <link href="{{ asset('css/customer.css') }}?{{ date('Ymd') }}" rel="stylesheet">
@@ -28,7 +28,7 @@
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
-                <a class="navbar-brand" href="{{ url('/schedule') }}">
+                <a class="navbar-brand" href="{{ url('/schedule-new/calendar') }}">
                     {{ config('app.name', 'Laravel') }}
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
@@ -55,8 +55,8 @@
                             @endif
                         @else
                             <li class="nav-list">
-                                <a href="{{ route('share.show') }}" class="nav-menu"
-                                href="{{ route('share.show') }}";>
+                                <a href="{{ route('share.index') }}" class="nav-menu"
+                                href="{{ route('share.index') }}";>
                                 予定共有管理</a>
                             </li>
                             <li class="nav-item dropdown nav-list">
@@ -69,8 +69,8 @@
                                 
                                     <p class="user-name">{{ Auth::user()->name }}さん</p>
 
-                                    <a class="dropdown-item" href="{{ route('customer.show') }}"
-                                       onclick="location.href='{{ route('customer.show') }}'";>
+                                    <a class="dropdown-item" href="{{ route('customer.index') }}"
+                                       onclick="location.href='{{ route('customer.index') }}'";>
                                         会員情報確認
                                     </a>
 

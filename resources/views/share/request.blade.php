@@ -1,5 +1,13 @@
-@extends('layouts.app')
+@extends('layouts.base')
 
+@section('style')
+<link href="{{ asset('css/app_old.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+<link href="{{ asset('css/base.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+<link href="{{ asset('css/register.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+<link href="{{ asset('css/schedule.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+<link href="{{ asset('css/customer.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+<link href="{{ asset('css/share.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+@endsection
 
 @section('content')
 <div class="share">

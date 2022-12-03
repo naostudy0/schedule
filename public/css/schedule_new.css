@@ -1,0 +1,151 @@
+@charset "UTF-8";
+
+/* Vue版のカレンダー用CSS */
+
+.content{
+  font-family: "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "メイリオ", "Meiryo", sans-serif;
+  margin:2em auto;
+  width:900px;
+}
+
+.button-area{
+  margin:0.5em 0;
+}
+
+.calendar{
+  max-width:900px;
+  border-top:1px solid #E0E0E0;
+  font-size:0.8em;
+}
+
+.week {
+  display:flex;
+  border-left:1px solid #E0E0E0;
+}
+
+.calendar-daily {
+  flex:1;
+  min-height:125px;
+  border-right:1px solid #E0E0E0;
+  border-bottom:1px solid #E0E0E0;
+}
+
+.calendar-daily:hover {
+  background-color: #c8d2fa4f;
+  transition-duration: 0.1s;
+}
+
+.date {
+  text-align: center;
+}
+
+.dayOfWeek {
+  flex:1;
+  border-right:1px solid #E0E0E0;
+  text-align:center;
+}
+
+.notCurrentMonth {
+  background-color: #d5d5d542;
+}
+
+.notCurrentMonth:hover {
+  background-color: #d5d5d542;
+}
+
+.plan {
+  color:white;
+  margin-bottom:1px;
+  height:25px;
+  line-height:25px;
+  position: relative;
+  z-index:1;
+  border-radius:4px;
+  padding-left:4px;
+}
+
+.title {
+  text-align: center;
+}
+
+div.content {
+  position: relative;
+}
+
+div.icon-wrap {
+  position: absolute;
+  padding: 5%;
+  right: 0;
+  top: -20px;
+  opacity: 0.3;
+}
+
+span.error {
+  color: red;
+}
+
+
+div.button-area button {
+  border-radius: 5px;
+  background-color: beige;
+  border-color: #ddd;
+}
+
+/* モーダル */
+
+.vm--modal h2 {
+  width: 100%;
+  text-align: center;
+  margin: 1%;
+  color: #5c5c5c;
+}
+
+.modal-body {
+  padding: 2%;
+}
+
+.modal-body div.content-modal label,
+.modal-body div.detail-modal label {
+  width: 100%;
+}
+
+.modal-body div.content-modal input,
+.modal-body div.detail-modal textarea {
+  width: 94%;
+}
+
+.modal-body div.detail-modal {
+  margin-top: 2%;
+}
+
+.modal-body div.datetime-modal,
+.modal-body div.color-modal {
+  margin-top: 1%;
+  margin-bottom: 1%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.modal-body label.modal-color-item {
+  display: inline-block;
+}
+
+.vm--modal {
+  height: 350px !important;
+  position: relative;
+}
+
+.modal-body button {
+  position: absolute;
+  width: 15%;
+  bottom: -30px;
+}
+
+.modal-body button.forward {
+  left: 15px;
+}
+
+.modal-body button.back {
+  right: 15px;
+}

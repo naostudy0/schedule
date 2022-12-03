@@ -1,23 +1,26 @@
-@extends('layouts.app')
+@extends('layouts.base')
 
+@section('style')
+<link href="{{ asset('css/app_old.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+<link href="{{ asset('css/base.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+<link href="{{ asset('css/register.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+<link href="{{ asset('css/schedule.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+<link href="{{ asset('css/customer.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+<link href="{{ asset('css/share.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+@endsection
 
 @section('content')
 <div class="customer">
-    <div class="link-wrap">
-        <p class="top-link float-left"><a href="{{ route('schedule') }}">予定一覧へ戻る</a></p>
-        @yield('btn_header')
-    </div><!-- link-wrap -->
+    @if (session('flash_msg'))
+        <div class="flash-message">
+            {{ session('flash_msg') }}
+        </div><!-- flash-message -->
+    @endif
 
     <div class="card">
         <div class="card-header text-center">
             <h2 class="title">@yield('title')</h2>
         </div><!-- card-header -->
-
-        @if (session('flash_msg'))
-            <div class="flash-message">
-                {{ session('flash_msg') }}
-            </div><!-- flash-message -->
-        @endif
 
         <div class="card-body">
         @yield('content_customer')

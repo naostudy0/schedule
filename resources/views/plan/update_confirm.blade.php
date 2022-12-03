@@ -1,13 +1,6 @@
 @extends('layouts.confirm')
 
-
-@section('style')
-    @include('layouts.include.add_layout')
-@endsection
-
-
 @section('title', '修正内容確認')
-
 
 @section('hidden')
     @csrf
