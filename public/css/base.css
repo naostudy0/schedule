@@ -95,6 +95,17 @@ nav li.has-child ul li a:active{
   background:#ca9135;
 }
 
+@media screen and (min-width: 769px) {
+  nav ul li button {
+    display: none;
+    padding: 1px 2px;
+  }
+
+  nav ul li.link {
+    display: block !important;
+  }
+}
+
 @media screen and (max-width: 768px) {
   nav{
     padding: 0;
@@ -102,6 +113,20 @@ nav li.has-child ul li a:active{
 
   nav ul{
     display: block;
+  }
+
+  span.link-icon {
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+  }
+
+  span.link-icon img {
+    width: 100%;
+  }
+
+  .display-block {
+    display: block !important;
   }
 
   nav li.has-child ul,
@@ -119,6 +144,20 @@ nav li.has-child ul li a:active{
 
   nav ul li a{
     border-bottom:1px solid #ccc;
+  }
+
+  nav ul li.logo {
+    position: relative;
+  }
+
+  nav ul li.link {
+    display: none;
+  }
+
+  nav ul li button {
+    position: absolute;
+    right: 0;
+    top: 13px;
   }
 
   nav ul li.has-child::before{

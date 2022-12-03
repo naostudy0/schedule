@@ -1,10 +1,6 @@
 @extends('layouts.customer')
 
-
-@section('title')
-登録内容修正
-@endsection
-
+@section('title', '登録内容修正')
 
 @section('content_customer')
 <div class="offset-md-2 col-md-8">

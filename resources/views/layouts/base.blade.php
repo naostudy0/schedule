@@ -16,13 +16,18 @@
     <div id="app">
         <nav>
             <ul>
-                <li>
+                <li class="logo">
+                    <button class="link-open" type="button" style="background-color:#fff;" onClick="linkOpen()">
+                        <span class="link-icon">
+                           <img src="{{ asset('image/bars_24.png') }}">
+                        </span>
+                    </button>
                     <a class="" href="{{ url('schedule-new/calendar') }}">{{ config('app.name') }}</a>
                 </li>
-                <li>
+                <li class="link">
                     <a href="{{ route('share.index') }}" class="nav-menu">予定共有管理</a>
                 </li>
-                <li class="has-child">
+                <li class="link has-child">
                     <a href="#">会員情報管理</a>
                     <ul>
                         <li>
@@ -52,13 +57,23 @@
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
         crossorigin="anonymous"
     ></script>
-
     <script>
-        function mediaQueriesWin(){
+        $(window).resize(function() {
+            mediaQueriesWin();
+        });
+        $(window).on('load',function() {
+            mediaQueriesWin();
+        });
+
+        /**
+         * ヘッダーサブメニューの表示・非表示切り替え
+         * @return {void}
+         */
+        function mediaQueriesWin() {
         let width = $(window).width();
             if(width <= 768) {
                 $(".has-child>a").on('click', function() {
-                    let parentElem =  $(this).parent();
+                    let parentElem = $(this).parent();
                     $(parentElem).toggleClass('active');
                     $(parentElem).children('ul').stop().slideToggle(500);
                     return false;
@@ -70,12 +85,20 @@
             }
         }
 
-        $(window).resize(function() {
-            mediaQueriesWin();
-        });
-        $(window).on('load',function() {
-            mediaQueriesWin();
-        });
+        /**
+         * スマホ表示のヘッダーメニュー表示・非表示切り替え
+         * @return {void}
+         */
+        function linkOpen() {
+            let links = document.getElementsByClassName('link');
+            for(i = 0; i < links.length; i++) {
+                if (links[i].classList.contains('display-block')) {
+                    links[i].classList.remove('display-block');
+                } else {
+                    links[i].classList.add('display-block');
+                }
+            }
+        }
     </script>
 </body>
 </html>

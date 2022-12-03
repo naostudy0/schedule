@@ -1,9 +1,6 @@
 @extends('layouts.customer')
 
-
-@section('title')
-会員情報
-@endsection
+@section('title', '会員情報')
 
 @section('content_customer')
 <dl>
