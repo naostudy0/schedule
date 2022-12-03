@@ -1,5 +1,5 @@
-<!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<!DOCTYPE html>
+<html lang="ja">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,71 +9,73 @@
     <!-- Scripts -->
     @yield('head_script')
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}?{{ date('Ymd') }}" rel="stylesheet">
-    <link href="{{ asset('css/base.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+    <link href="{{ asset('css/reset.css') }}?{{ date('Ymd') }}" rel="stylesheet">
     @yield('style')
 </head>
 <body>
     <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url('schedule-new/calendar') }}">
-                    {{ config('app.name', 'Laravel') }}
-                </a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav ml-auto">
-                        @guest
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                            </li>
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
-                            @endif
-                        @else
-                            <li class="nav-list">
-                                <a href="{{ route('share.index') }}" class="nav-menu">
-                                予定共有管理</a>
-                            </li>
-                            <li class="nav-item dropdown nav-list">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle nav-menu" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    会員情報 <span class="caret"></span>
-                                </a>
-
-
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                
-                                    <p class="user-name">{{ Auth::user()->name }}さん</p>
-
-                                    <a class="dropdown-item" href="{{ route('customer.index') }}"
-                                       onclick="location.href='{{ route('customer.index') }}'">
-                                        会員情報確認
-                                    </a>
-
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                        ログアウト
-                                    </a>
-
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                        @csrf
-                                    </form>
-                                </div>
-                            </li>
-                        @endguest
+        <nav>
+            <ul>
+                <li>
+                    <a class="" href="{{ url('schedule-new/calendar') }}">{{ config('app.name') }}</a>
+                </li>
+                <li>
+                    <a href="{{ route('share.index') }}" class="nav-menu">予定共有管理</a>
+                </li>
+                <li class="has-child">
+                    <a href="#">会員情報管理</a>
+                    <ul>
+                        <li>
+                            <a class="" href="{{ route('customer.index') }}">会員情報確認</a>
+                        </li>
+                        <li>
+                            <a class="" href="{{ route('logout') }}"
+                                onclick="event.preventDefault();
+                                document.getElementById('logout-form').submit();"
+                            >
+                                ログアウト
+                            </a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                @csrf
+                            </form>
+                        </li>
                     </ul>
-                </div>
-            </div>
+                </li>
+            </ul>
         </nav>
-
         @yield('content')
     </div>
+
     @yield('body_script')
+    <script
+        src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous"
+    ></script>
+
+    <script>
+        function mediaQueriesWin(){
+        let width = $(window).width();
+            if(width <= 768) {
+                $(".has-child>a").on('click', function() {
+                    let parentElem =  $(this).parent();
+                    $(parentElem).toggleClass('active');
+                    $(parentElem).children('ul').stop().slideToggle(500);
+                    return false;
+                });
+            } else {
+                $(".has-child>a").off('click');
+                $(".has-child").removeClass('active');
+                $('.has-child').children('ul').css("display","");
+            }
+        }
+
+        $(window).resize(function() {
+            mediaQueriesWin();
+        });
+        $(window).on('load',function() {
+            mediaQueriesWin();
+        });
+    </script>
 </body>
 </html>

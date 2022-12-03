@@ -1,11 +1,18 @@
 @extends('layouts.base')
 
+@section('style')
+<link href="{{ asset('css/app_old.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+<link href="{{ asset('css/base.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+<link href="{{ asset('css/register.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+<link href="{{ asset('css/schedule.css') }}?{{ date('Ymd') }}" rel="stylesheet">
+@endsection
+
 @section('content')
   <div class="container">
     <div class="row">
       <div class="calendar col-sm-10 col-md-8 col-lg-4">
         @if (session('flash_msg'))
-          <div class="flash-message">
+          <div class="flash-message" style="margin-top:10px;">
             {{ session('flash_msg') }}
           </div><!-- flash-message -->
         @endif
@@ -20,24 +27,28 @@
             {!! $calendar->render() !!}
           </div><!-- card-body -->
         </div><!-- card -->
-        <p class="description">日付をクリックして予定を登録できます</p>
-        <p class="description add">予定共有管理から予定共有ユーザーを追加すると、予定入力時に共有選択画面が追加されます。</p>
+        @if (! $days_have_plan)
+          <p class="description">日付をクリックして予定を登録できます</p>
+          <p class="description add">予定共有管理から予定共有ユーザーを追加すると、予定入力時に共有選択画面が追加されます。</p>
+        @endif
       </div><!-- calendar -->
 
       <div class="plan-list col-lg-8 col-md-10 col-lg-7">
         <h2>予定一覧</h2>
-        <ul>
-          @php $plan_colors = []; @endphp
-          @foreach ($plans as $plan)
-            @if (! in_array($plan->color, $plan_colors))
-              <li class="color" id="{{ array_flip(config('const.plan_color'))[$plan->color] }}">&nbsp;</li>
-              @php $plan_colors[] = $plan->color; @endphp
+        @if ($days_have_plan)
+          <ul>
+            @php $plan_colors = []; @endphp
+            @foreach ($plans as $plan)
+              @if (! in_array($plan->color, $plan_colors))
+                <li class="color" id="{{ array_flip(config('const.plan_color'))[$plan->color] }}">&nbsp;</li>
+                @php $plan_colors[] = $plan->color; @endphp
+              @endif
+            @endforeach
+            @if (count(array_unique($plan_colors)) >= 2)
+              <li class="color selected" id="all">ALL</li>
             @endif
-          @endforeach
-          @if (count(array_unique($plan_colors)) >= 2)
-            <li class="color selected" id="all">ALL</li>
-          @endif
-        </ul>
+          </ul>
+        @endif
 
         @foreach ($days_have_plan as $day)
           <div class="plans-oneday">
@@ -109,7 +120,8 @@
   </div><!-- container -->
 @endsection
 
-@section('script')
+@section('body_script')
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script>
     $(function() {
       $('.plan-main').on('click', function() {

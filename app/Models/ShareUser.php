@@ -148,7 +148,7 @@ class ShareUser extends Model
     {
         $share_user_id = DB::table('users')
             ->where('share_id', $share_id)
-            ->value('id');
+            ->value('user_id');
 
         DB::table($this->table)
             ->where(function ($query) use ($user_id, $share_user_id) {

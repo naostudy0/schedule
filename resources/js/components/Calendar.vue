@@ -9,8 +9,8 @@
     <div class="title">
       <h1>{{ displayDate }}</h1>
       <div class="button-area">
-        <button @click="prevMonth">前月</button>
-        <button @click="nextMonth">翌月</button>
+        <button @click="prevMonth">◀︎</button>
+        <button @click="nextMonth">▶︎</button>
       </div>
     </div>
     <div
@@ -58,49 +58,59 @@
       </div>
     </div>
     <!-- モーダル -->
-    <modal name="makePlanArea">
+    <modal name="makePlanArea" style="height: 350px;">
       <form onsubmit="return false">
         <!-- tokenはaxiosで設定されるため記載しない -->
         <div
           class="modal-header"
           :style="`background-color:${modalColor}`"
         >
-          <h2>予定入力</h2>
+          <h2 v-if="updatePlanId === 0">
+            予定入力
+          </h2>
+          <h2 v-else>
+            予定更新
+          </h2>
         </div>
         <div
           class="modal-body"
           v-if="Object.keys(apiData).length"
         >
-          <div>
-            <label>開始日時
+          <div class="datetime-modal">
+            <div class="start-datetime-modal">
+              <label>開始日時
+                <input
+                  type="date"
+                  name="startDate"
+                  v-model="modalData.startDate"
+                  :readonly="isSharedPlan"
+                  @blur="validateDateTime()"
+                ></label>
               <input
-              type="date"
-              name="startDate"
-              v-model="modalData.startDate"
-              :readonly="isSharedPlan"
-              @blur="validateDateTime()"
-            ></label>
-            <input
-              type="time"
-              name="startTime"
-              v-model="modalData.startTime"
-              :readonly="isSharedPlan"
-              @blur="validateDateTime()"
-            >
-            <label>終了日時<input
-              type="date"
-              name="endDate"
-              v-model="modalData.endDate"
-              :readonly="isSharedPlan"
-              @blur="validateDateTime()"
-            ></label>
-            <input
-              type="time"
-              name="endTime"
-              v-model="modalData.endTime"
-              :readonly="isSharedPlan"
-              @blur="validateDateTime()"
-            >
+                type="time"
+                name="startTime"
+                v-model="modalData.startTime"
+                :readonly="isSharedPlan"
+                @blur="validateDateTime()"
+              >
+            </div>
+            <div class="end-datetime-modal">
+              <label>終了日時
+                <input
+                  type="date"
+                  name="endDate"
+                  v-model="modalData.endDate"
+                  :readonly="isSharedPlan"
+                  @blur="validateDateTime()"
+                ></label>
+              <input
+                type="time"
+                name="endTime"
+                v-model="modalData.endTime"
+                :readonly="isSharedPlan"
+                @blur="validateDateTime()"
+              >
+            </div>
           </div>
           <div v-if="! validate.datetime">
             <span class="error">
@@ -109,25 +119,28 @@
           </div>
 
           <!-- 共有された予定の場合は非表示 -->
-          <div v-if="! isSharedPlan">
+          <div
+            v-if="! isSharedPlan"
+            class="color-modal"
+          >
             <span>カラー</span>
             <span
               v-for="(color, index) in apiData.data.colorsFlip"
               :key="index"
             >
-            <label>
+            <label class="modal-color-item">
                 <input
                   name="color"
                   type="radio"
                   :value="index"
                   v-model="colorNum"
                 >
-                {{ index + ': ' + color }}
+                {{ color }}
               </label>
             </span>
           </div>
 
-          <div>
+          <div class="content-modal">
             <label>内容
               <input
                 type="text"
@@ -137,14 +150,14 @@
                 @blur="validateContent()"
               >
             </label>
-          </div>
-          <div v-if="! validate.content">
-            <span class="error">
-              内容は必須です
-            </span>
+            <div v-if="! validate.content">
+              <span class="error">
+                内容は必須です
+              </span>
+            </div>
           </div>
 
-          <div>
+          <div class="detail-modal">
             <label>詳細
               <textarea
                 name="detail"
@@ -153,7 +166,7 @@
             </label>
           </div>
 
-          <div v-if="! isSharedPlan">
+          <div v-if="isSharedPlan">
             予定共有
             <span v-for="shareUser in apiData.data.shareUsers">
               <label>
@@ -197,17 +210,32 @@
           </div>
 
           <span v-if="updatePlanId === 0">
-            <button @click="isAfterInput ? storePlan() : validateBeforeInput()">登録</button>
-            <button @click="hide">キャンセル</button>
+            <button
+              class="forward"
+              @click="isAfterInput ? storePlan() : validateBeforeInput()"
+            >登録</button>
+            <button
+              class="back"
+              @click="hide"
+            >キャンセル</button>
           </span>
           <span v-else>
             <span v-if="isSharedPlan">
               <!-- 自分が作成していない予定は更新させない -->
-              <button @click="hide">閉じる</button>
+              <button
+                class="back"
+                @click="hide"
+              >閉じる</button>
             </span>
             <span v-else>
-              <button @click="isAfterInput ? updatePlan() : validateBeforeInput()">更新</button>
-              <button @click="hide">キャンセル</button>
+              <button
+                class="forward"
+                @click="isAfterInput ? updatePlan() : validateBeforeInput()"
+              >更新</button>
+              <button
+                class="back"
+                @click="hide"
+              >キャンセル</button>
             </span>
           </span>
         </div>
@@ -658,78 +686,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-.content{
-  margin:2em auto;
-  width:900px;
-}
-
-.button-area{
-  margin:0.5em 0;
-}
-
-.calendar{
-  max-width:900px;
-  border-top:1px solid #E0E0E0;
-  font-size:0.8em;
-}
-
-.week {
-  display:flex;
-  border-left:1px solid #E0E0E0;
-}
-
-.calendar-daily{
-  flex:1;
-  min-height:125px;
-  border-right:1px solid #E0E0E0;
-  border-bottom:1px solid #E0E0E0;
-  margin-right:-1px;
-}
-
-.date {
-  text-align: center;
-}
-
-.dayOfWeek {
-  flex:1;
-  border-right:1px solid #E0E0E0;
-  margin-right:-1px;
-  text-align:center;
-}
-
-.notCurrentMonth {
-  background-color: #f7f7f7;
-}
-
-.plan {
-  color:white;
-  margin-bottom:1px;
-  height:25px;
-  line-height:25px;
-  position: relative;
-  z-index:1;
-  border-radius:4px;
-  padding-left:4px;
-}
-
-.title {
-  text-align: center;
-}
-
-div.content {
-  position: relative;
-}
-
-div.icon-wrap {
-  position: absolute;
-  padding: 5%;
-  right: 0;
-  opacity: 0.3;
-}
-
-span.error {
-  color: red;
-}
-</style>

@@ -15,7 +15,7 @@
                 <nav class="links">
                     @if (Route::has('login'))
                         @auth
-                            <a href="{{ url('/schedule') }}">予定管理へ</a>
+                            <a href="{{ url('/schedule-new/Calendar') }}">予定管理へ</a>
                         @else
                             <a href="{{ route('login') }}">ログイン</a>
 

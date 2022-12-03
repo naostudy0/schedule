@@ -5,13 +5,6 @@
 会員情報
 @endsection
 
-
-@section('btn_header')
-<a href="{{ route('logout') }}" onclick="event.preventDefault();
-document.getElementById('logout-form').submit();"><p class="float-right logout btn btn-secondary">ログアウト</p></a>
-@endsection
-
-
 @section('content_customer')
 <dl>
     <div class="offset-md-2 col-md-8">
