@@ -52,7 +52,7 @@ class ShareUser extends Model
             ->get();
 
         if ($rows->isEmpty()) {
-            return;
+            return [];
         }
 
         foreach ($rows as $row) {

@@ -6429,7 +6429,7 @@ var render = function render() {
       name: "detail",
       readonly: _vm.isSharedPlan
     }
-  }, [_vm._v(_vm._s(_vm.modalData.detail))])])]), _vm._v(" "), Object.keys(_vm.apiData.data.shareUsers).length ? _c("div", [_vm.apiData.data.sharedUserNames.hasOwnProperty(_vm.updatePlanId) && _vm.updatePlanId !== 0 && _vm.modalData.planMadeUserId !== _vm.apiData.data.userId ? _c("div", [_c("span", [_vm._v("この予定は、" + _vm._s(_vm.modalData.planMadeUserName) + " さんに共有されています")])]) : _c("div", [_c("div", {
+  }, [_vm._v(_vm._s(_vm.modalData.detail))])])]), _vm._v(" "), Object.keys(_vm.apiData.data.shareUsers).length ? _c("div", [Object.keys(_vm.apiData.data.sharedUserNames).length && _vm.apiData.data.sharedUserNames.hasOwnProperty(_vm.updatePlanId) && _vm.updatePlanId !== 0 && _vm.modalData.planMadeUserId !== _vm.apiData.data.userId ? _c("div", [_c("span", [_vm._v("この予定は、" + _vm._s(_vm.modalData.planMadeUserName) + " さんに共有されています")])]) : _c("div", [_c("div", {
     staticClass: "share-modal"
   }, _vm._l(_vm.apiData.data.shareUsers, function (shareUser) {
     return _c("div", [_c("span", [_vm._v("共有")]), _vm._v(" "), _c("label", [_c("input", {

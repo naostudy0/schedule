@@ -175,7 +175,8 @@
           <!-- 共有しているユーザーがいる場合 -->
           <div v-if="Object.keys(apiData.data.shareUsers).length">
             <!-- 共有されている場合 -->
-            <div v-if="apiData.data.sharedUserNames.hasOwnProperty(updatePlanId)
+            <div v-if="Object.keys(apiData.data.sharedUserNames).length
+              && apiData.data.sharedUserNames.hasOwnProperty(updatePlanId)
               && updatePlanId !== 0 && modalData.planMadeUserId !== apiData.data.userId"
             >
               <span>この予定は、{{ modalData.planMadeUserName }} さんに共有されています</span>
