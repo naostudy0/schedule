@@ -4,32 +4,38 @@
 
 div.content{
   font-family: "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "メイリオ", "Meiryo", sans-serif;
-  margin:2em auto;
+  margin: 2em auto;
   position: relative;
   width: 100%;
 }
 
+div.header {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+}
+
 .button-area{
-  margin:0.5em 0;
+  margin: 0.5em 0;
 }
 
 .calendar{
-  max-width:900px;
-  border-top:1px solid #E0E0E0;
-  font-size:0.8em;
+  max-width: 900px;
+  border-top: 1px solid #E0E0E0;
+  font-size: 0.8em;
   margin: 0 auto;
 }
 
 .week {
-  display:flex;
-  border-left:1px solid #E0E0E0;
+  display: flex;
+  border-left: 1px solid #E0E0E0;
 }
 
 .calendar-daily {
-  flex:1;
-  min-height:125px;
-  border-right:1px solid #E0E0E0;
-  border-bottom:1px solid #E0E0E0;
+  flex: 1;
+  min-height: 125px;
+  border-right: 1px solid #E0E0E0;
+  border-bottom: 1px solid #E0E0E0;
 }
 
 .calendar-daily:hover {
@@ -43,8 +49,8 @@ div.content{
 
 .dayOfWeek {
   flex:1;
-  border-right:1px solid #E0E0E0;
-  text-align:center;
+  border-right: 1px solid #E0E0E0;
+  text-align: center;
 }
 
 .notCurrentMonth {
@@ -56,14 +62,14 @@ div.content{
 }
 
 .plan {
-  color:white;
-  margin-bottom:1px;
-  height:25px;
-  line-height:25px;
+  color: white;
+  margin-bottom: 1px;
+  height: 25px;
+  line-height: 25px;
   position: relative;
-  z-index:1;
-  border-radius:4px;
-  padding-left:4px;
+  z-index: 1;
+  border-radius: 4px;
+  padding-left: 4px;
 }
 
 .title {
@@ -141,7 +147,7 @@ div.button-area button {
 }
 
 .vm--modal {
-  height: 350px !important;
+  height: 420px !important;
   position: relative;
 }
 
@@ -157,6 +163,13 @@ div.button-area button {
 
 .modal-body button.back {
   right: 15px;
+}
+
+.modal-body div.share-modal {
+  padding-left: 2%;
+  border: 1px solid #eee;
+  max-height: 48px;
+  overflow: scroll;
 }
 
 @media screen and (max-width: 600px) {
@@ -184,7 +197,7 @@ div.button-area button {
 
   .vm--modal {
     top: 20vh !important;
-    height: 500px !important;
+    height: 480px !important;
     position: relative;
   }
 }

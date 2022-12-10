@@ -495,6 +495,8 @@ var render = function render() {
   return _c("div", {
     staticClass: "content"
   }, [_c("div", {
+    staticClass: "header"
+  }, [_c("div", {
     staticClass: "icon-wrap",
     on: {
       drop: _vm.onAlert,
@@ -519,7 +521,7 @@ var render = function render() {
     on: {
       click: _vm.nextMonth
     }
-  }, [_vm._v("▶︎")])])]), _vm._v(" "), Object.keys(_vm.apiData).length ? _c("div", {
+  }, [_vm._v("▶︎")])])])]), _vm._v(" "), Object.keys(_vm.apiData).length ? _c("div", {
     staticClass: "calendar"
   }, [_c("div", {
     staticClass: "week"
@@ -747,21 +749,22 @@ var render = function render() {
       name: "detail",
       readonly: _vm.isSharedPlan
     }
-  }, [_vm._v(_vm._s(_vm.modalData.detail))])])]), _vm._v(" "), _vm.isSharedPlan ? _c("div", [_vm._v("\n          予定共有\n          "), _vm._l(_vm.apiData.data.shareUsers, function (shareUser) {
-    return _c("span", [_c("label", [_c("input", {
+  }, [_vm._v(_vm._s(_vm.modalData.detail))])])]), _vm._v(" "), Object.keys(_vm.apiData.data.shareUsers).length ? _c("div", [_vm.apiData.data.sharedUserNames.hasOwnProperty(_vm.updatePlanId) && _vm.updatePlanId !== 0 && _vm.modalData.planMadeUserId !== _vm.apiData.data.userId ? _c("div", [_c("span", [_vm._v("この予定は、" + _vm._s(_vm.modalData.planMadeUserName) + " さんに共有されています")])]) : _c("div", [_c("div", {
+    staticClass: "share-modal"
+  }, _vm._l(_vm.apiData.data.shareUsers, function (shareUser) {
+    return _c("div", [_c("span", [_vm._v("共有")]), _vm._v(" "), _c("label", [_c("input", {
       attrs: {
         type: "checkbox",
         name: "shareUser"
       },
       domProps: {
-        value: shareUser.share_id
+        value: shareUser.share_id,
+        checked: _vm.apiData.data.sharedUserNames.hasOwnProperty(_vm.updatePlanId) && Object.keys(_vm.apiData.data.sharedUserNames[_vm.updatePlanId]).find(function (key) {
+          return _vm.apiData.data.sharedUserNames[_vm.updatePlanId][key] === shareUser.name;
+        })
       }
-    }), _vm._v("\n              " + _vm._s(shareUser.name) + "\n            ")])]);
-  })], 2) : _vm._e(), _vm._v(" "), _vm.apiData.data.sharedUserNames[_vm.updatePlanId] !== undefined ? _c("div", [_vm.updatePlanId !== 0 && _vm.modalData.planMadeUserId !== _vm.apiData.data.userId ? _c("span", [_vm._v("\n            この予定は、" + _vm._s(_vm.modalData.planMadeUserName) + " さんに共有されています\n          ")]) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm.apiData.data.sharedUserNames[_vm.updatePlanId] !== undefined ? _c("div", [_vm._l(_vm.apiData.data.sharedUserNames[_vm.updatePlanId], function (userName, userId) {
-    return _c("ul", {
-      key: userId
-    }, [userId != _vm.apiData.data.userId ? _c("li", [_vm._v("\n              " + _vm._s(userName) + "さん\n            ")]) : _vm._e()]);
-  }), _vm._v(" "), Object.keys(_vm.apiData.data.sharedUserNames[_vm.updatePlanId]).length === 1 && _vm.modalData.planMadeUserId === _vm.apiData.data.userId ? _c("span", [_vm._v("\n            と共有しています\n          ")]) : _vm._e()], 2) : _vm._e(), _vm._v(" "), _vm.updatePlanId === 0 ? _c("span", [_c("button", {
+    }), _vm._v("\n                  " + _vm._s(shareUser.name) + "\n                ")]), _c("br")]);
+  }), 0)])]) : _vm._e(), _vm._v(" "), _vm.updatePlanId === 0 ? _c("span", [_c("button", {
     staticClass: "forward",
     on: {
       click: function click($event) {

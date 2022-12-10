@@ -1,16 +1,18 @@
 <template>
   <div class="content">
-    <div class="icon-wrap"
-      @drop="onAlert"
-      @dragover.prevent
-    >
-      <font-awesome-icon icon="fa-solid fa-trash-can" class="fa-2x"/>
-    </div>
-    <div class="title">
-      <h1>{{ displayDate }}</h1>
-      <div class="button-area">
-        <button @click="prevMonth">◀︎</button>
-        <button @click="nextMonth">▶︎</button>
+    <div class="header">
+      <div class="icon-wrap"
+        @drop="onAlert"
+        @dragover.prevent
+      >
+        <font-awesome-icon icon="fa-solid fa-trash-can" class="fa-2x"/>
+      </div>
+      <div class="title">
+        <h1>{{ displayDate }}</h1>
+        <div class="button-area">
+          <button @click="prevMonth">◀︎</button>
+          <button @click="nextMonth">▶︎</button>
+        </div>
       </div>
     </div>
     <div
@@ -170,47 +172,32 @@
             </label>
           </div>
 
-          <div v-if="isSharedPlan">
-            予定共有
-            <span v-for="shareUser in apiData.data.shareUsers">
-              <label>
-                <input
-                  type="checkbox"
-                  name="shareUser"
-                  :value="shareUser.share_id"
-                >
-                {{ shareUser.name }}
-              </label>
-            </span>
-          </div>
-
-          <div
-            v-if="apiData.data.sharedUserNames[updatePlanId] !== undefined"
-          >
-            <span
-              v-if="updatePlanId !== 0 && modalData.planMadeUserId !== apiData.data.userId"
+          <!-- 共有しているユーザーがいる場合 -->
+          <div v-if="Object.keys(apiData.data.shareUsers).length">
+            <!-- 共有されている場合 -->
+            <div v-if="apiData.data.sharedUserNames.hasOwnProperty(updatePlanId)
+              && updatePlanId !== 0 && modalData.planMadeUserId !== apiData.data.userId"
             >
-              この予定は、{{ modalData.planMadeUserName }} さんに共有されています
-            </span>
-          </div>
-
-          <div
-            v-if="apiData.data.sharedUserNames[updatePlanId] !== undefined"
-          >
-            <ul v-for="(userName, userId) in apiData.data.sharedUserNames[updatePlanId]"
-              :key="userId"
-            >
-              <li v-if="userId != apiData.data.userId">
-                {{ userName }}さん
-              </li>
-            </ul>
-            <span
-              v-if="Object.keys(apiData.data.sharedUserNames[updatePlanId]).length === 1
-                && modalData.planMadeUserId === apiData.data.userId"
-            >
-            <!-- 共有が一人で作成者が自分ではない場合は、自分だけが共有された人になり名前を表示しないので以下も非表示 -->
-              と共有しています
-            </span>
+              <span>この予定は、{{ modalData.planMadeUserName }} さんに共有されています</span>
+            </div>
+            <div v-else>
+              <div class="share-modal">
+                <div v-for="shareUser in apiData.data.shareUsers">
+                  <span>共有</span>
+                  <label>
+                    <input
+                      type="checkbox"
+                      name="shareUser"
+                      :value="shareUser.share_id"
+                      :checked="apiData.data.sharedUserNames.hasOwnProperty(updatePlanId)
+                        && Object.keys(apiData.data.sharedUserNames[updatePlanId])
+                          .find(key => apiData.data.sharedUserNames[updatePlanId][key] === shareUser.name)"
+                    >
+                    {{ shareUser.name }}
+                  </label><br>
+                </div>
+              </div>
+            </div>
           </div>
 
           <span v-if="updatePlanId === 0">

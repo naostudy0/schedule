@@ -78,7 +78,7 @@ class Plan extends Model
     {
         $shared_user_ids = [];
         if ($request->input('share_user')) {
-            foreach ($request->only('share_user') as $share_id){
+            foreach ($request->input('share_user') as $share_id){
                 $shared_user_ids[] = DB::table('users')
                     ->where('share_id', $share_id)
                     ->value('user_id');
