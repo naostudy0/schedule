@@ -130,7 +130,7 @@
                             <form action="{{ route('share.request.permit') }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="share_id" value="{{ $requested_user->share_id }}">
-                                <input type="hidden" name="permit" value="2">
+                                <input type="hidden" name="permit" value="0">
                                 <button type="submit" class="btn btn-danger float-right permission-btn">却下</button>
                             </form>
                         </div><!-- permit-buttons -->

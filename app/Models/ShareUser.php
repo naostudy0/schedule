@@ -115,7 +115,7 @@ class ShareUser extends Model
         $target_id = DB::table('users')
             ->where('share_id', $share_id)
             ->where('share_permission', 1)
-            ->value('id');
+            ->value('user_id');
 
         $row = DB::table($this->table)
             ->where('requested_user_id', $target_id)

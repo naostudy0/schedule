@@ -7,6 +7,7 @@ use App\Models\ShareUser;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ShareController extends Controller
@@ -161,7 +162,7 @@ class ShareController extends Controller
     public function sharePermit(Request $request)
     {
         $permit = $request->input('permit');
-        if (! ($permit == 0 || $permit == 1)) {
+        if ($permit !== '0' && $permit !== '1') {
             return redirect()->back();
         }
 
@@ -212,14 +213,30 @@ class ShareController extends Controller
             return redirect()->route('share.index')->with('flash_msg', '予定共有を許可しました');
         }
 
-        $this->share_user->create([
-            'requested_user_id' => $user_id,
-            'received_user_id'  => $target_id,
-            'is_replied' => 0,
-            'is_shared'  => 0,
-        ]);
+        $result = false;
+        DB::beginTransaction();
+        try {
+            $this->share_user->create([
+                'requested_user_id' => $user_id,
+                'received_user_id'  => $target_id,
+                'is_replied' => 0,
+                'is_shared'  => 0,
+            ]);
+            if (Auth::user()->share_permission === 0) {
+                // 共有を許可していない場合は許可
+                $this->user->where('user_id', Auth::id())
+                    ->update([
+                        'share_permission' => 1
+                    ]);
+            }
+            DB::commit();
+            $result = true;
+        } catch (\Exception $e) {
+            DB::rollback();
+        }
+        $flash_msg = $result ? '予定共有申請が完了しました' : '予定共有申請に失敗しました';
 
-        return redirect()->route('share.index')->with('flash_msg', '予定共有申請が完了しました');
+        return redirect()->route('share.index')->with('flash_msg', $flash_msg);
     }
 
     /**
