@@ -561,7 +561,7 @@ var render = function render() {
               return _vm.update(plan);
             }
           }
-        }, [_vm._v("\n          " + _vm._s(plan.startDatetime.substr(0, 10) === day.date || day.dayOfWeekNum === 0 ? plan.content : "") + "\n        ")]);
+        }, [plan.startDatetime.substr(0, 10) === day.date ? _c("span", [_vm._v("\n            " + _vm._s(plan.startDatetime.substr(11, 5) + " " + plan.content) + "\n          ")]) : day.dayOfWeekNum === 0 ? _c("span", [_vm._v("\n            " + _vm._s(plan.content) + "\n          ")]) : _vm._e()]);
       })], 2);
     }), 0);
   })], 2) : _vm._e(), _vm._v(" "), _c("modal", {
@@ -684,9 +684,9 @@ var render = function render() {
     }
   })])]), _vm._v(" "), !_vm.validate.datetime ? _c("div", [_c("span", {
     staticClass: "error"
-  }, [_vm._v("\n            終了日時は開始時間より後の日時を入力してください\n          ")])]) : _vm._e(), _vm._v(" "), !_vm.isSharedPlan ? _c("div", {
+  }, [_vm._v("\n            終了日時は開始時間より後の日時を入力してください\n          ")])]) : _vm._e(), _vm._v(" "), !_vm.isSharedPlan ? _c("div", [_c("span", [_vm._v("カラー")]), _vm._v(" "), _c("div", {
     staticClass: "color-modal"
-  }, [_c("span", [_vm._v("カラー")]), _vm._v(" "), _vm._l(_vm.apiData.data.colorsFlip, function (color, index) {
+  }, _vm._l(_vm.apiData.data.colorsFlip, function (color, index) {
     return _c("span", {
       key: index
     }, [_c("label", {
@@ -711,8 +711,8 @@ var render = function render() {
           _vm.colorNum = index;
         }
       }
-    }), _vm._v("\n              " + _vm._s(color) + "\n            ")])]);
-  })], 2) : _vm._e(), _vm._v(" "), _c("div", {
+    }), _vm._v("\n                " + _vm._s(color) + "\n              ")])]);
+  }), 0)]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "content-modal"
   }, [_c("label", [_vm._v("内容\n            "), _c("input", {
     directives: [{

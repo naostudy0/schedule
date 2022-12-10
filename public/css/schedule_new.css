@@ -2,10 +2,11 @@
 
 /* Vue版のカレンダー用CSS */
 
-.content{
+div.content{
   font-family: "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "メイリオ", "Meiryo", sans-serif;
   margin:2em auto;
-  width:900px;
+  position: relative;
+  width: 100%;
 }
 
 .button-area{
@@ -16,6 +17,7 @@
   max-width:900px;
   border-top:1px solid #E0E0E0;
   font-size:0.8em;
+  margin: 0 auto;
 }
 
 .week {
@@ -68,10 +70,6 @@
   text-align: center;
 }
 
-div.content {
-  position: relative;
-}
-
 div.icon-wrap {
   position: absolute;
   padding: 5%;
@@ -102,6 +100,7 @@ div.button-area button {
 
 .modal-body {
   padding: 2%;
+  position: inherit;
 }
 
 .modal-body div.content-modal label,
@@ -124,7 +123,17 @@ div.button-area button {
   margin-bottom: 1%;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.modal-body div.datetime-modal {
   justify-content: space-between;
+}
+
+.modal-body div.color-modal {
+  padding-left: 2%;
+  justify-content: space-around;
+  border: 1px solid #ddd;
 }
 
 .modal-body label.modal-color-item {
@@ -139,7 +148,7 @@ div.button-area button {
 .modal-body button {
   position: absolute;
   width: 15%;
-  bottom: -30px;
+  bottom: 3%;
 }
 
 .modal-body button.forward {
@@ -148,4 +157,34 @@ div.button-area button {
 
 .modal-body button.back {
   right: 15px;
+}
+
+@media screen and (max-width: 600px) {
+  .vm--modal {
+    left: 2% !important;
+    width: 96% !important;
+  }
+
+  .modal-body button {
+    width: 25%;
+  }
+
+  .modal-body button.forward {
+    left: 10px;
+  }
+  
+  .modal-body button.back {
+    right: 10px;
+  }
+
+  .modal-body div.content-modal input,
+  .modal-body div.detail-modal textarea {
+    width: 100%;
+  }
+
+  .vm--modal {
+    top: 20vh !important;
+    height: 500px !important;
+    position: relative;
+  }
 }

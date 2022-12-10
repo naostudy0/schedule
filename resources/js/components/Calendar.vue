@@ -52,7 +52,12 @@
             @drag="setDragPlanId(plan.planId)"
             @click.stop="update(plan)"
           >
-            {{ (plan.startDatetime.substr(0, 10) === day.date || day.dayOfWeekNum === 0) ? plan.content : '' }}
+            <span v-if="plan.startDatetime.substr(0, 10) === day.date">
+              {{ plan.startDatetime.substr(11, 5) + ' ' + plan.content }}
+            </span>
+            <span v-else-if="day.dayOfWeekNum === 0">
+              {{ plan.content }}
+            </span>
           </div>
         </div>
       </div>
@@ -119,25 +124,24 @@
           </div>
 
           <!-- 共有された予定の場合は非表示 -->
-          <div
-            v-if="! isSharedPlan"
-            class="color-modal"
-          >
+          <div v-if="! isSharedPlan">
             <span>カラー</span>
-            <span
+            <div class="color-modal">
+              <span
               v-for="(color, index) in apiData.data.colorsFlip"
               :key="index"
-            >
-            <label class="modal-color-item">
-                <input
+              >
+              <label class="modal-color-item">
+                  <input
                   name="color"
                   type="radio"
                   :value="index"
                   v-model="colorNum"
-                >
-                {{ color }}
-              </label>
-            </span>
+                  >
+                  {{ color }}
+                </label>
+              </span>
+            </div>
           </div>
 
           <div class="content-modal">
