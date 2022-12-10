@@ -3,15 +3,16 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
-use App\Models\User;
-use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\Request;
-use Illuminate\Auth\Events\Registered;
 use App\Mail\EmailVerification;
+use App\Models\User;
+use App\Providers\RouteServiceProvider;
+use Carbon\Carbon;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
 {
@@ -34,6 +35,10 @@ class RegisterController extends Controller
      * @var string
      */
     protected $redirectTo = RouteServiceProvider::HOME;
+    /**
+     * @var \App\Models\User
+     */
+    protected $user;
 
     /**
      * Create a new controller instance.
@@ -43,6 +48,7 @@ class RegisterController extends Controller
     public function __construct()
     {
         $this->middleware('guest');
+        $this->user = new User;
     }
 
     /**
@@ -172,7 +178,7 @@ class RegisterController extends Controller
         $user->name = $request->name;
         $user->password = $request->password;
 
-        return view('auth.main.register_check', compact('user','email_token'));
+        return view('auth.main.register_check', compact('user', 'email_token'));
     }
 
     /**
@@ -183,12 +189,20 @@ class RegisterController extends Controller
      */
     public function mainRegister(Request $request)
     {
-        $user = User::where('email_verify_token',$request->email_token)->first();
-        $user->status = config('const.user_status.register');
-        $user->name = $request->name;
-        $user->password = Hash::make($request->password);
-        $user->email_verified_at = date('Y-m-d H:i:s');
-        $user->save();
+        // 共有IDの作成
+        do {
+            $rand = md5(uniqid());
+            $share_id = substr($rand, 0, 8);
+        } while ($this->user->where('share_id', $share_id)->exists());
+
+        $this->user->where('email_verify_token', $request->email_token)
+            ->update([
+                'status' => config('const.user_status.register'),
+                'name' => $request->name,
+                'password' => Hash::make($request->password),
+                'email_verified_at' => Carbon::now(),
+                'share_id' => $share_id,
+            ]);
 
         return view('auth.main.registered');
     }
