@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <div class="header">
-      <div class="icon-wrap"
+      <div class="icon-wrap w-769-u"
         @drop="onAlert"
         @dragover.prevent
       >
@@ -67,6 +67,14 @@
     <!-- モーダル -->
     <modal name="makePlanArea" style="height: 350px;">
       <form onsubmit="return false">
+        <div v-if="updatePlanId > 0">
+          <div
+            class="icon-wrap"
+            @click="deletePlan"
+          >
+            <font-awesome-icon icon="fa-solid fa-trash-can" class="fa-2x"/>
+          </div>
+        </div>
         <!-- tokenはaxiosで設定されるため記載しない -->
         <div
           class="modal-header"
@@ -276,6 +284,15 @@ export default {
       let dayOfWeekNum = startOfMonth.day()
 
       return startOfMonth.subtract(dayOfWeekNum, 'd')
+    },
+    /**
+     * 予定削除（スマホ表示）
+     * @return {void}
+     */
+    deletePlan() {
+      this.dragPlanId = this.updatePlanId
+      this.hide()
+      this.onAlert()
     },
     /**
      * カレンダーの最後の日付（土曜）を取得

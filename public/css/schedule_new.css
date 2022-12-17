@@ -172,6 +172,17 @@ div.button-area button {
   overflow: scroll;
 }
 
+@media screen and (max-width: 768px) {
+  .w-769-u {
+    display: none;
+  }
+
+  div.icon-wrap {
+    top: -17px;
+    opacity: 0.5;
+  }
+}
+
 @media screen and (max-width: 600px) {
   .vm--modal {
     left: 2% !important;

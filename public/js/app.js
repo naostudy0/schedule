@@ -5760,6 +5760,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return startOfMonth.subtract(dayOfWeekNum, 'd');
     },
     /**
+     * 予定削除（スマホ表示）
+     * @return {void}
+     */deletePlan: function deletePlan() {
+      this.dragPlanId = this.updatePlanId;
+      this.hide();
+      this.onAlert();
+    },
+    /**
      * カレンダーの最後の日付（土曜）を取得
      * @return {object}
      */getEndDate: function getEndDate() {
@@ -6177,7 +6185,7 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "header"
   }, [_c("div", {
-    staticClass: "icon-wrap",
+    staticClass: "icon-wrap w-769-u",
     on: {
       drop: _vm.onAlert,
       dragover: function dragover($event) {
@@ -6257,7 +6265,17 @@ var render = function render() {
     attrs: {
       onsubmit: "return false"
     }
-  }, [_c("div", {
+  }, [_vm.updatePlanId > 0 ? _c("div", [_c("div", {
+    staticClass: "icon-wrap",
+    on: {
+      click: _vm.deletePlan
+    }
+  }, [_c("font-awesome-icon", {
+    staticClass: "fa-2x",
+    attrs: {
+      icon: "fa-solid fa-trash-can"
+    }
+  })], 1)]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "modal-header",
     style: "background-color:".concat(_vm.modalColor)
   }, [_vm.updatePlanId === 0 ? _c("h2", [_vm._v("\n          予定入力\n        ")]) : _c("h2", [_vm._v("\n          予定更新\n        ")])]), _vm._v(" "), Object.keys(_vm.apiData).length ? _c("div", {
