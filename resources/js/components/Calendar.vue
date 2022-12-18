@@ -69,7 +69,7 @@
       <form onsubmit="return false">
         <div v-if="updatePlanId > 0">
           <div
-            class="icon-wrap"
+            class="icon-wrap w-768-d"
             @click="deletePlan"
           >
             <font-awesome-icon icon="fa-solid fa-trash-can" class="fa-2x"/>

@@ -586,7 +586,7 @@ var render = function render() {
       onsubmit: "return false"
     }
   }, [_vm.updatePlanId > 0 ? _c("div", [_c("div", {
-    staticClass: "icon-wrap",
+    staticClass: "icon-wrap w-768-d",
     on: {
       click: _vm.deletePlan
     }

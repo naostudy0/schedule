@@ -183,6 +183,12 @@ div.button-area button {
   }
 }
 
+@media screen and (min-width: 769px) {
+  .w-768-d {
+    display: none;
+  }
+}
+
 @media screen and (max-width: 600px) {
   .vm--modal {
     left: 2% !important;
