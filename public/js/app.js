@@ -6078,13 +6078,33 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         okText: 'はい',
         cancelText: 'キャンセル'
       }).then(function (response) {
-        axios.get('/api/schedule/destroy/' + _this6.dragPlanId).then(function (response) {
+        _this6.deletePlanApi().then(function (response) {
           // 予定削除後にカレンダー再描画
           _this6.getCalendar();
         });
       })["catch"](function (response) {
         return response;
       });
+    },
+    /**
+     * 予定削除のAPI
+     * @return {void}
+     */deletePlanApi: function deletePlanApi() {
+      var _this7 = this;
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                _context4.next = 2;
+                return axios.get('/api/schedule/destroy/' + _this7.dragPlanId);
+              case 2:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4);
+      }))();
     },
     /**
      * 日付のバリデーション

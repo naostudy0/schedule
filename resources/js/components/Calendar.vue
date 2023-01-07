@@ -597,13 +597,20 @@ export default {
         cancelText: 'キャンセル',
       })
       .then(response => {
-        axios.get('/api/schedule/destroy/' + this.dragPlanId)
+        this.deletePlanApi()
         .then(response => {
           // 予定削除後にカレンダー再描画
           this.getCalendar()
         })
       })
       .catch(response => response)
+    },
+    /**
+     * 予定削除のAPI
+     * @return {void}
+     */
+    async deletePlanApi() {
+      await axios.get('/api/schedule/destroy/' + this.dragPlanId)
     },
     /**
      * 日付のバリデーション
