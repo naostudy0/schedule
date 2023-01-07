@@ -398,10 +398,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         okText: 'はい',
         cancelText: 'キャンセル'
       }).then(function (response) {
-        axios.get('/api/schedule/destroy/' + _this6.dragPlanId);
-      }).then(function (response) {
-        // 予定削除後にカレンダー再描画
-        _this6.getCalendar();
+        axios.get('/api/schedule/destroy/' + _this6.dragPlanId).then(function (response) {
+          // 予定削除後にカレンダー再描画
+          _this6.getCalendar();
+        });
       })["catch"](function (response) {
         return response;
       });

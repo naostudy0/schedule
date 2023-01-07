@@ -598,10 +598,10 @@ export default {
       })
       .then(response => {
         axios.get('/api/schedule/destroy/' + this.dragPlanId)
-      })
-      .then(response => {
-        // 予定削除後にカレンダー再描画
-        this.getCalendar()
+        .then(response => {
+          // 予定削除後にカレンダー再描画
+          this.getCalendar()
+        })
       })
       .catch(response => response)
     },
